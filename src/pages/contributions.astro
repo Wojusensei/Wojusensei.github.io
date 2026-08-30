@@ -1,8 +1,54 @@
 ---
+// 贡献板块：数据全部在构建时抓取并烘焙进页面（每 6 小时定时重建 + push 触发 + 手动按钮）
+// 访客端零 GitHub 请求，与接口限流彻底无关
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { contributions } from '../data/contributions';
-import { site } from '../data/site';
+import { fetchGhStats, fetchUpstreamStars } from '../lib/github-data';
+
+const stats = await fetchGhStats();
+const upstreamStars = await fetchUpstreamStars(contributions.repos.map((r) => r.repo));
+
+const fmt = (v: number | null) => (v === null ? '–' : String(v));
+const rate =
+  stats.prs !== null && stats.mergedPrs !== null
+    ? Math.round((stats.mergedPrs / stats.prs) * 100) + '%'
+    : '–';
+
+// 语言饼图：取前 6 项，其余归入「其他」
+const COLORS = ['#8fb0ff', '#b48cff', '#5fd4c4', '#f2cd60', '#ff9e9e', '#7fd1ff', '#9aa7bf'];
+const R = 70;
+const CIRC = 2 * Math.PI * R;
+const top = stats.languages.slice(0, 6);
+const rest = stats.languages.slice(6);
+const pieSlices = (() => {
+  const data = rest.length
+    ? [...top, { name: '__others__', bytes: rest.reduce((s, d) => s + d.bytes, 0) }]
+    : top;
+  const total = data.reduce((s, d) => s + d.bytes, 0) || 1;
+  let offset = 0;
+  return data.map((d, i) => {
+    const len = (d.bytes / total) * CIRC;
+    const seg = {
+      color: COLORS[i % COLORS.length],
+      len,
+      offset,
+      pct: ((d.bytes / total) * 100).toFixed(1),
+      name: d.name,
+      others: d.name === '__others__',
+    };
+    offset += len;
+    return seg;
+  });
+})();
+
+// cpython PR：实时列表为空时回退到静态兜底（contributions.ts 的 fallbackPrs）
+const fallback = (
+  contributions.repos.find((r) => 'fallbackPrs' in r) as
+    | { fallbackPrs: { number: number; title: string; url: string; merged: boolean }[] }
+    | undefined
+)?.fallbackPrs ?? [];
+const cpythonPrs = stats.cpythonPrs.length ? stats.cpythonPrs : fallback;
 
 const repos = contributions.repos.map((r) => ({
   ...r,
@@ -19,21 +65,43 @@ const repos = contributions.repos.map((r) => ({
       <h2 class="section-title" style="font-size:1.2rem" data-i18n="contrib.statsTitle">统计面板</h2>
     </div>
     <div class="stats-grid">
-      <div class="g-card stat-tile"><span class="stat-num" data-stat="starsEarned">–</span><span class="stat-label" data-i18n="contrib.starsEarned">总 Star 获得数</span></div>
-      <div class="g-card stat-tile"><span class="stat-num" data-stat="commits">–</span><span class="stat-label" data-i18n="contrib.commits">总 Commit 数</span></div>
-      <div class="g-card stat-tile"><span class="stat-num" data-stat="prs">–</span><span class="stat-label" data-i18n="contrib.prs">总 PR 数</span></div>
-      <div class="g-card stat-tile"><span class="stat-num" data-stat="mergedPrs">–</span><span class="stat-label" data-i18n="contrib.mergedPrs">被 Merge 的 PR 数</span></div>
-      <div class="g-card stat-tile"><span class="stat-num" data-stat="mergeRate">–</span><span class="stat-label" data-i18n="contrib.mergeRate">PR 合并概率</span></div>
-      <div class="g-card stat-tile"><span class="stat-num" data-stat="issues">–</span><span class="stat-label" data-i18n="contrib.issues">提起的总 Issue 数</span></div>
-      <div class="g-card stat-tile"><span class="stat-num" data-stat="reviews">–</span><span class="stat-label" data-i18n="contrib.reviews">代码审查次数</span></div>
+      <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.starsEarned)}</span><span class="stat-label" data-i18n="contrib.starsEarned">总 Star 获得数</span></div>
+      <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.commits)}</span><span class="stat-label" data-i18n="contrib.commits">总 Commit 数</span></div>
+      <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.prs)}</span><span class="stat-label" data-i18n="contrib.prs">总 PR 数</span></div>
+      <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.mergedPrs)}</span><span class="stat-label" data-i18n="contrib.mergedPrs">被 Merge 的 PR 数</span></div>
+      <div class="g-card stat-tile"><span class="stat-num">{rate}</span><span class="stat-label" data-i18n="contrib.mergeRate">PR 合并概率</span></div>
+      <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.issues)}</span><span class="stat-label" data-i18n="contrib.issues">提起的总 Issue 数</span></div>
+      <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.reviews)}</span><span class="stat-label" data-i18n="contrib.reviews">代码审查次数</span></div>
     </div>
 
     <div class="g-card pie-card" style="margin-top:18px">
-      <svg class="pie-donut" id="lang-pie" viewBox="0 0 200 200" aria-hidden="true"></svg>
-      <div class="pie-legend" id="lang-legend"></div>
+      {pieSlices.length > 0 && (
+        <svg class="pie-donut" viewBox="0 0 200 200" aria-hidden="true">
+          {pieSlices.map((d) => (
+            <circle
+              cx="100" cy="100" r={String(R)}
+              fill="none" stroke={d.color} stroke-width="30"
+              stroke-dasharray={`${d.len} ${CIRC - d.len}`}
+              stroke-dashoffset={String(-d.offset)}
+              transform="rotate(-90 100 100)"
+            />
+          ))}
+        </svg>
+      )}
+      <div class="pie-legend">
+        {pieSlices.map((d) => (
+          <div class="pl-row">
+            <span class="pl-dot" style={`background:${d.color}`}></span>
+            {d.others
+              ? <span class="pl-name" data-i18n="contrib.others">其他</span>
+              : <span class="pl-name">{d.name}</span>}
+            <span class="pl-pct">{d.pct}%</span>
+          </div>
+        ))}
+      </div>
       <div style="flex:1;min-width:160px">
         <h3 style="margin:0 0 6px;font-size:1.05rem" data-i18n="contrib.pieTitle">常用编程语言比例</h3>
-        <p class="section-desc" style="font-size:.86rem" data-i18n="contrib.pieNote">按公开仓库的代码字节统计，数据来自 GitHub，缓存 1 小时。</p>
+        <p class="section-desc" style="font-size:.86rem" data-i18n="contrib.pieNote">按公开仓库的代码字节统计，数据在构建时抓取，每 6 小时自动刷新。</p>
       </div>
     </div>
 
@@ -45,7 +113,9 @@ const repos = contributions.repos.map((r) => ({
         <div class="g-card contrib-card">
           <div class="wc-head">
             <h3><a href={r.ghUrl} target="_blank" rel="noopener" style="color:var(--text)">{r.repo.split('/')[1]}</a></h3>
-            <span class="stars-badge on"><Icon name="star" /><span class="stars-num" data-repo-stars={r.repo}>–</span></span>
+            <span class="stars-badge on">
+              <Icon name="star" /><span class="stars-num">{upstreamStars[r.repo] ?? '–'}</span>
+            </span>
           </div>
           <p class="contrib-note" data-lang-zh>{r.note}</p>
           <p class="contrib-note" data-lang-en style="display:none">{r.noteEn}</p>
@@ -55,9 +125,11 @@ const repos = contributions.repos.map((r) => ({
               <h4 style="margin:0 0 6px;font-size:.9rem;color:var(--text-2)" data-i18n="contrib.pluginsTitle">旗下插件</h4>
               <div class="plugin-list">
                 {r.plugins.map((p) => (
-                  <a class="plugin-row" href={`${site.socials.github}/${p}`} target="_blank" rel="noopener">
+                  <a class="plugin-row" href={`https://github.com/${p}`} target="_blank" rel="noopener">
                     <span>{p.replace('nonebot-plugin-', '')}</span>
-                    <span class="stars-badge on"><Icon name="star" /><span data-plugin-stars={p}>–</span></span>
+                    <span class="stars-badge on">
+                      <Icon name="star" /><span class="stars-num">{stats.ownStars[p] ?? '–'}</span>
+                    </span>
                   </a>
                 ))}
               </div>
@@ -65,7 +137,18 @@ const repos = contributions.repos.map((r) => ({
           ) : (
             <div style="margin-top:10px">
               <h4 style="margin:0 0 6px;font-size:.9rem;color:var(--text-2)">PR</h4>
-              <ul class="pr-list" id="cpython-prs"><li class="section-desc">…</li></ul>
+              <ul class="pr-list">
+                {cpythonPrs.map((pr) => (
+                  <li>
+                    <span class={`pr-badge ${pr.merged ? 'merged' : 'open'}`}>
+                      <span data-lang-zh>{pr.merged ? '已合并' : '待审'}</span>
+                      <span data-lang-en style={pr.merged ? 'display:none' : ''}>{pr.merged ? 'merged' : 'open'}</span>
+                    </span>
+                    <a href={pr.url} target="_blank" rel="noopener">#{pr.number} {pr.title}</a>
+                  </li>
+                ))}
+                {cpythonPrs.length === 0 && <li class="section-desc">–</li>}
+              </ul>
             </div>
           )}
         </div>
@@ -73,164 +156,3 @@ const repos = contributions.repos.map((r) => ({
     </div>
   </section>
 </Base>
-<script>
-  import { loadContribStats, loadPluginStars } from '../lib/contrib-stats';
-  import { contributions } from '../data/contributions';
-
-  function setStat(key: string, val: string) {
-    const el = document.querySelector<HTMLElement>(`[data-stat="${key}"]`);
-    if (el) el.textContent = val;
-  }
-
-  function renderPie(languages: { name: string; bytes: number }[]) {
-    const svg = document.getElementById('lang-pie');
-    const legend = document.getElementById('lang-legend');
-    if (!svg || !legend) return;
-    if (!languages.length) return;
-    const top = languages.slice(0, 6);
-    const rest = languages.slice(6);
-    const data = rest.length
-      ? [...top, { name: getOthersLabel(), bytes: rest.reduce((s, d) => s + d.bytes, 0) }]
-      : top;
-    const total = data.reduce((s, d) => s + d.bytes, 0) || 1;
-    const colors = ['#8fb0ff', '#b48cff', '#5fd4c4', '#f2cd60', '#ff9e9e', '#7fd1ff', '#9aa7bf'];
-    const R = 70;
-    const C = 2 * Math.PI * R;
-    let offset = 0;
-    const NS = 'http://www.w3.org/2000/svg';
-    svg.innerHTML = '';
-    const rows: HTMLElement[] = [];
-    data.forEach((d, i) => {
-      const len = (d.bytes / total) * C;
-      const circle = document.createElementNS(NS, 'circle');
-      circle.setAttribute('cx', '100');
-      circle.setAttribute('cy', '100');
-      circle.setAttribute('r', String(R));
-      circle.setAttribute('fill', 'none');
-      circle.setAttribute('stroke', colors[i % colors.length]);
-      circle.setAttribute('stroke-width', '30');
-      circle.setAttribute('stroke-dasharray', `${len} ${C - len}`);
-      circle.setAttribute('stroke-dashoffset', String(-offset));
-      circle.setAttribute('transform', 'rotate(-90 100 100)');
-      svg.appendChild(circle);
-      offset += len;
-
-      const row = document.createElement('div');
-      row.className = 'pl-row';
-      const dot = document.createElement('span');
-      dot.className = 'pl-dot';
-      dot.style.background = colors[i % colors.length];
-      const name = document.createElement('span');
-      name.className = 'pl-name';
-      name.textContent = d.name;
-      const pct = document.createElement('span');
-      pct.className = 'pl-pct';
-      pct.textContent = ((d.bytes / total) * 100).toFixed(1) + '%';
-      row.append(dot, name, pct);
-      rows.push(row);
-    });
-    legend.replaceChildren(...rows);
-  }
-
-  function getOthersLabel(): string {
-    const locale = (localStorage.getItem('woju-lang') as 'zh' | 'en') || 'zh';
-    return locale === 'en' ? 'Others' : '其他';
-  }
-
-  function renderCpythonPrs(list: { number: number; title: string; url: string; merged: boolean }[]) {
-    const ul = document.getElementById('cpython-prs');
-    if (!ul) return;
-    if (!list.length) {
-      // 实时搜索失败时回退到配置里的静态 PR（contributions.ts 的 fallbackPrs）
-      list = (contributions.repos.find((r) => 'fallbackPrs' in r) as any)?.fallbackPrs ?? [];
-    }
-    if (!list.length) {
-      ul.innerHTML = '<li class="section-desc">–</li>';
-      return;
-    }
-    const locale = (localStorage.getItem('woju-lang') as 'zh' | 'en') || 'zh';
-    ul.innerHTML = '';
-    for (const pr of list) {
-      const li = document.createElement('li');
-      const badge = document.createElement('span');
-      badge.className = 'pr-badge ' + (pr.merged ? 'merged' : 'open');
-      badge.textContent = pr.merged
-        ? locale === 'en' ? 'merged' : '已合并'
-        : locale === 'en' ? 'open' : '待审';
-      const a = document.createElement('a');
-      a.href = pr.url;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.textContent = `#${pr.number} ${pr.title}`;
-      li.append(badge, a);
-      ul.appendChild(li);
-    }
-  }
-
-  const fmt = (v: number | null) => (v === null ? '–' : String(v));
-  loadContribStats().then(({ stats }) => {
-    if (!stats) return;
-    setStat('starsEarned', fmt(stats.starsEarned));
-    setStat('commits', fmt(stats.commits));
-    setStat('prs', fmt(stats.prs));
-    setStat('mergedPrs', fmt(stats.mergedPrs));
-    setStat(
-      'mergeRate',
-      stats.prs !== null && stats.mergedPrs !== null
-        ? Math.round((stats.mergedPrs / stats.prs) * 100) + '%'
-        : '–',
-    );
-    setStat('issues', fmt(stats.issues));
-    setStat('reviews', fmt(stats.reviews));
-    renderPie(stats.languages);
-    renderCpythonPrs(stats.cpythonPrs);
-  });
-
-  // 插件 star 数
-  const pluginRepos = contributions.repos.flatMap((r) => ('plugins' in r && r.plugins ? r.plugins : []));
-  loadPluginStars(pluginRepos).then((map) => {
-    document.querySelectorAll<HTMLElement>('[data-plugin-stars]').forEach((el) => {
-      const name = el.dataset.pluginStars!;
-      el.textContent = map[name] !== undefined ? String(map[name]) : '–';
-    });
-  });
-
-  // 仓库本身的 star 数：取上游高星仓库本体（如 python/cpython），缓存 1 小时
-  async function fillRepoStars() {
-    const els = document.querySelectorAll<HTMLElement>('[data-repo-stars]');
-    const KEY = 'woju-upstream-stars';
-    let cache: Record<string, { c: number; ts: number }> = {};
-    try {
-      cache = JSON.parse(localStorage.getItem(KEY) || '{}');
-    } catch { /* 重新拉取 */ }
-    for (const el of els) {
-      const full = el.dataset.repoStars!;
-      const hit = cache[full];
-      if (hit && Date.now() - hit.ts < 60 * 60 * 1000) {
-        el.textContent = String(hit.c);
-        continue;
-      }
-      try {
-        const r = await fetch(`https://api.github.com/repos/${full}`, {
-          headers: site.githubToken ? { Authorization: `Bearer ${site.githubToken}` } : {},
-        });
-        if (!r.ok) continue;
-        const info = await r.json();
-        el.textContent = String(info.stargazers_count);
-        cache[full] = { c: info.stargazers_count, ts: Date.now() };
-      } catch { /* 网络失败保持占位 */ }
-    }
-    localStorage.setItem(KEY, JSON.stringify(cache));
-  }
-  fillRepoStars();
-
-  // 语言切换时同步 PR 徽章
-  window.addEventListener('woju-lang', () => {
-    // 触发一次重渲染：从缓存读取即可（若缓存不存在则静默跳过）
-    import('../lib/contrib-stats').then(({ loadContribStats }) => {
-      loadContribStats().then(({ stats }) => {
-        if (stats) renderCpythonPrs(stats.cpythonPrs);
-      });
-    });
-  });
-</script>

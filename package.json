@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "dev": "NODE_OPTIONS=--use-system-ca astro dev",
+    "build": "NODE_OPTIONS=--use-system-ca astro build",
+    "preview": "NODE_OPTIONS=--use-system-ca astro preview"
   },
   "dependencies": {
     "astro": "^5.12.0",

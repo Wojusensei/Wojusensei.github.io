@@ -2,15 +2,23 @@
 import Base from '../layouts/Base.astro';
 import WorkCard from '../components/WorkCard.astro';
 import { works } from '../data/works';
+import { fetchGhStats } from '../lib/github-data';
+
+const stats = await fetchGhStats();
+const starsFor = (work: (typeof works)[number]): number | null => {
+  const repos = work.repos ?? [work.repo];
+  const total = repos.reduce((s, r) => s + (stats.ownStars[r] ?? 0), 0);
+  return total > 0 ? total : null;
+};
 ---
 <Base active="works" title="作品" desc="Wojusensei 在 GitHub 上的开源项目">
   <section class="section wrap" style="margin-top:24px">
     <div class="section-head">
       <h1 class="section-title" data-i18n="works.title">作品</h1>
-      <p class="section-desc" data-i18n="works.subtitle">GitHub 上的开源项目，点卡片可以跳转到仓库</p>
+      <p class="section-desc" data-i18n="works.subtitle">一些开源项目</p>
     </div>
     <div class="grid cols-3">
-      {works.map((w) => <WorkCard work={w} />)}
+      {works.map((w) => <WorkCard work={w} stars={starsFor(w)} />)}
     </div>
   </section>
 </Base>

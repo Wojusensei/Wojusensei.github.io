@@ -1,11 +1,11 @@
 ---
-// 作品卡片：整卡跳转 GitHub 仓库；star 数客户端实时拉取（聚合卡取总和）
+// 作品卡片：整卡跳转 GitHub 仓库；star 数由构建时抓取并烘焙进页面
 import type { Work } from '../data/works';
 import { site } from '../data/site';
 import Icon from './Icon.astro';
 
-interface Props { work: Work; }
-const { work } = Astro.props;
+interface Props { work: Work; stars: number | null; }
+const { work, stars } = Astro.props;
 const repos = work.repos ?? [work.repo];
 ---
 <a
@@ -13,78 +13,17 @@ const repos = work.repos ?? [work.repo];
   href={`${site.socials.github}/${work.repo}`}
   target="_blank"
   rel="noopener"
-  data-repos={repos.join(',')}
 >
   <div class="wc-head">
     <h3>{work.name}</h3>
-    <span class="stars-badge" title="GitHub stars" data-no-grab>
-      <Icon name="star" /><span class="stars-num">–</span>
-    </span>
+    {stars !== null && (
+      <span class="stars-badge on" title="GitHub stars">
+        <Icon name="star" /><span class="stars-num">{stars}</span>
+      </span>
+    )}
   </div>
   <p class="desc-zh" data-lang-zh>{work.desc}</p>
   <p class="desc-en" data-lang-en style="display:none">{work.descEn}</p>
   <div class="tags">{work.tags.map((t) => <span class="tag">{t}</span>)}</div>
   <span class="go" data-i18n="works.viewOnGithub">在 GitHub 查看 →</span>
 </a>
-<script>
-  import { site } from '../data/site';
-
-  // 实时 star 数：一次请求拉取全部公开仓库；缓存 30 分钟；
-  // 接口限流/断网时回退到上次成功的旧数据，星标永不消失
-  const CACHE_KEY = 'woju-stars';
-  const TTL = 30 * 60 * 1000;
-
-  function readCache(allowStale: boolean): { map: Record<string, number> } | null {
-    try {
-      const c = JSON.parse(localStorage.getItem(CACHE_KEY) || '');
-      const ageOk = c?.ts && Date.now() - c.ts < TTL;
-      if (c?.map && (ageOk || allowStale)) return c;
-    } catch { /* 缓存无效 */ }
-    return null;
-  }
-
-  async function loadStars() {
-    let map = readCache(false)?.map ?? null;
-    if (!map) {
-      try {
-        const res = await fetch('https://api.github.com/users/Wojusensei/repos?per_page=100', {
-          headers: site.githubToken ? { Authorization: `Bearer ${site.githubToken}` } : {},
-        });
-        if (!res.ok) throw new Error(String(res.status));
-        const list = (await res.json()) as { name: string; stargazers_count: number }[];
-        map = {};
-        for (const r of list) map[r.name] = r.stargazers_count;
-        localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), map }));
-      } catch {
-        map = readCache(true)?.map ?? null; // 限流/断网：用旧数据，绝不空手
-      }
-    }
-    if (!map) return;
-    document.querySelectorAll<HTMLElement>('.work-card').forEach((card) => {
-      const repos = (card.dataset.repos || '').split(',').filter(Boolean);
-      const total = repos.reduce((sum, r) => sum + (map![r] ?? 0), 0);
-      const badge = card.querySelector<HTMLElement>('.stars-badge');
-      const num = card.querySelector<HTMLElement>('.stars-num');
-      if (badge && num) {
-        num.textContent = String(total);
-        badge.classList.add('on');
-      }
-    });
-  }
-  loadStars();
-
-  // 跟随语言切换显示对应描述
-  function syncWorkLang() {
-    const locale = localStorage.getItem('woju-lang') || 'zh';
-    document.querySelectorAll<HTMLElement>('.work-card').forEach((card) => {
-      const zh = card.querySelector<HTMLElement>('[data-lang-zh]');
-      const en = card.querySelector<HTMLElement>('[data-lang-en]');
-      if (zh && en) {
-        zh.style.display = locale === 'en' ? 'none' : '';
-        en.style.display = locale === 'en' ? '' : 'none';
-      }
-    });
-  }
-  syncWorkLang();
-  window.addEventListener('woju-lang', syncWorkLang);
-</script>

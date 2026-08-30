@@ -56,6 +56,15 @@ export function applyLocale(locale: Locale) {
     if (typeof v === 'string') el.setAttribute(attr!, v);
   });
 
+  // 构建时烘焙的双语片段（如 PR 徽章、仓库描述）：跟随语言切换显示
+  const en = locale === 'en';
+  document.querySelectorAll<HTMLElement>('[data-lang-zh]').forEach((el) => {
+    el.style.display = en ? 'none' : '';
+  });
+  document.querySelectorAll<HTMLElement>('[data-lang-en]').forEach((el) => {
+    el.style.display = en ? '' : 'none';
+  });
+
   const btn = document.getElementById('lang-toggle');
   if (btn) btn.textContent = locale === 'zh' ? 'EN' : '中文';
 
