@@ -2,6 +2,7 @@
 // - 匿名搜索接口限流 10 次/分钟：全部请求串行 + 失败重试一次，避免并发触发 429
 // - Star 总数 / 语言占比：仓库列表 + 各仓库 languages 字节统计
 // - 全部结果缓存 1 小时（v2）；接口失败时回退缓存，再失败由页面显示占位
+import { site } from '../data/site';
 
 export interface ContribStats {
   prs: number | null;
@@ -19,6 +20,13 @@ const TTL = 60 * 60 * 1000;
 const USER = 'Wojusensei';
 const API = 'https://api.github.com';
 const JSON_HEADERS = { Accept: 'application/vnd.github+json' };
+
+// 带上只读令牌：匿名 60 次/小时/IP → 5,000 次/小时
+function ghHeaders(): Record<string, string> {
+  return site.githubToken
+    ? { ...JSON_HEADERS, Authorization: `Bearer ${site.githubToken}` }
+    : { ...JSON_HEADERS };
+}
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -39,7 +47,7 @@ function writeCache(stats: ContribStats) {
 
 async function ghJSON(url: string): Promise<any | null> {
   try {
-    const r = await fetch(url, { headers: JSON_HEADERS });
+    const r = await fetch(url, { headers: ghHeaders() });
     if (!r.ok) return null;
     return await r.json();
   } catch {

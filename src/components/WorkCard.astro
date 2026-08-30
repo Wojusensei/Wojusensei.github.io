@@ -27,6 +27,8 @@ const repos = work.repos ?? [work.repo];
   <span class="go" data-i18n="works.viewOnGithub">在 GitHub 查看 →</span>
 </a>
 <script>
+  import { site } from '../data/site';
+
   // 实时 star 数：一次请求拉取全部公开仓库；缓存 30 分钟；
   // 接口限流/断网时回退到上次成功的旧数据，星标永不消失
   const CACHE_KEY = 'woju-stars';
@@ -45,7 +47,9 @@ const repos = work.repos ?? [work.repo];
     let map = readCache(false)?.map ?? null;
     if (!map) {
       try {
-        const res = await fetch('https://api.github.com/users/Wojusensei/repos?per_page=100');
+        const res = await fetch('https://api.github.com/users/Wojusensei/repos?per_page=100', {
+          headers: site.githubToken ? { Authorization: `Bearer ${site.githubToken}` } : {},
+        });
         if (!res.ok) throw new Error(String(res.status));
         const list = (await res.json()) as { name: string; stargazers_count: number }[];
         map = {};

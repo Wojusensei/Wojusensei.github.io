@@ -211,7 +211,9 @@ const repos = contributions.repos.map((r) => ({
         continue;
       }
       try {
-        const r = await fetch(`https://api.github.com/repos/${full}`);
+        const r = await fetch(`https://api.github.com/repos/${full}`, {
+          headers: site.githubToken ? { Authorization: `Bearer ${site.githubToken}` } : {},
+        });
         if (!r.ok) continue;
         const info = await r.json();
         el.textContent = String(info.stargazers_count);
