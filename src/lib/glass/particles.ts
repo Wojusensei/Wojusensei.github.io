@@ -1,14 +1,24 @@
-// 星尘粒子系统：受鼠标影响的自稳定物理引擎
-// - 每颗粒子有"锚点"，被鼠标搅动后以弹簧力回到锚点附近（自稳定）
-// - 锚点自身缓慢漂移 + 亮度闪烁，像星野一样活着
-// - 鼠标靠近时被推开，快速划过时还会被"尾流"拖走
-// - 遵循 prefers-reduced-motion：静态渲染一帧
+// 背景层：星尘粒子 + 手电跟随 + 流星雨（左上→右下）+ 鼠标视差 + 点击涟漪
+// 全部绘制在同一张画布上，会被液态玻璃卡片真实折射
 
 interface Particle {
   x: number; y: number; vx: number; vy: number;
   ax: number; ay: number;              // 锚点
   phase: number; speed: number; amp: number; // 锚点漂移
   size: number; alpha: number; tw: number;   // 亮度闪烁
+}
+
+// 流星：统一从左上划向右下，渐隐尾迹
+interface Meteor {
+  x: number; y: number;
+  vx: number; vy: number;
+  life: number; ttl: number;
+  len: number;
+}
+
+// 点击涟漪
+interface Ripple {
+  x: number; y: number; life: number; ttl: number;
 }
 
 const MOUSE_RADIUS = 130;
@@ -67,10 +77,35 @@ export function initParticles() {
     });
   }
 
-  // 鼠标状态
-  const mouse = { x: -9999, y: -9999, vx: 0, vy: 0, on: false };
-  // 手电：平滑跟随鼠标的光斑（微型，低强度）
-  const light = { x: -9999, y: -9999, a: 0 };
+  // ---- 流星雨：全部从左上划向右下，高频密集，偶发爆发 ----
+  let meteors: Meteor[] = [];
+  let spawnTimer = 0.3;
+  let lastFrame = 0;
+
+  function spawnMeteor() {
+    const angle = (26 + Math.random() * 14) * (Math.PI / 180); // 26°~40°，统一左上→右下
+    const speed = 900 + Math.random() * 800;
+    let x: number, y: number;
+    if (Math.random() < 0.7) {
+      x = -140 + Math.random() * W * 0.85;
+      y = -60;
+    } else {
+      x = -140;
+      y = -40 + Math.random() * H * 0.55;
+    }
+    meteors.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0,
+      ttl: 0.8 + Math.random() * 0.9,
+      len: 100 + Math.random() * 150,
+    });
+  }
+
+  // ---- 鼠标/陀螺仪视差（很轻）----
+  const parallax = { tx: 0, ty: 0, x: 0, y: 0 };
+
   let lastMX = 0, lastMY = 0;
   window.addEventListener('pointermove', (e) => {
     mouse.vx = e.clientX - lastMX;
@@ -78,15 +113,48 @@ export function initParticles() {
     lastMX = e.clientX; lastMY = e.clientY;
     mouse.x = e.clientX; mouse.y = e.clientY;
     mouse.on = true;
+    const nx = e.clientX / Math.max(W, 1) - 0.5;
+    const ny = e.clientY / Math.max(H, 1) - 0.5;
+    parallax.tx = nx * -14; // 反向漂移，幅度刻意很轻
+    parallax.ty = ny * -9;
   }, { passive: true });
   window.addEventListener('pointerleave', () => { mouse.on = false; });
   window.addEventListener('blur', () => { mouse.on = false; });
+
+  // 移动端陀螺仪视差（iOS 需授权后才有事件，无事件则自动无效果）
+  window.addEventListener('deviceorientation', (e) => {
+    const g = Math.max(-30, Math.min(30, e.gamma ?? 0));
+    const b = Math.max(-30, Math.min(30, (e.beta ?? 0) - 40));
+    parallax.tx = (-g / 30) * 10;
+    parallax.ty = (b / 30) * 7;
+  });
+
+  // ---- 点击涟漪 ----
+  const ripples: Ripple[] = [];
+  window.addEventListener('pointerdown', (e) => {
+    if (!reduced) ripples.push({ x: e.clientX, y: e.clientY, life: 0, ttl: 0.75 });
+  }, { passive: true });
+
+  const mouse = { x: -9999, y: -9999, vx: 0, vy: 0, on: false };
+  // 手电：平滑跟随鼠标的光斑（微型，低强度）
+  const light = { x: -9999, y: -9999, a: 0 };
 
   function step(t: number) {
     ctx!.clearRect(0, 0, W, H);
     ctx!.globalCompositeOperation = 'lighter';
 
-    // 手电跟随：位置与强度都做插值，移开时缓缓熄灭
+    const dt = Math.min(Math.max(t - lastFrame, 0), 0.05);
+    lastFrame = t;
+
+    // ---- 视差：插值 + 写入 CSS 变量驱动背景照片层 ----
+    if (!reduced) {
+      parallax.x += (parallax.tx - parallax.x) * 0.045;
+      parallax.y += (parallax.ty - parallax.y) * 0.045;
+      document.documentElement.style.setProperty('--bg-px', parallax.x.toFixed(2) + 'px');
+      document.documentElement.style.setProperty('--bg-py', parallax.y.toFixed(2) + 'px');
+    }
+
+    // ---- 手电跟随：位置与强度都做插值，移开时缓缓熄灭 ----
     if (mouse.on && !reduced) {
       if (light.x < -999) { light.x = mouse.x; light.y = mouse.y; }
       light.x += (mouse.x - light.x) * 0.14;
@@ -108,15 +176,75 @@ export function initParticles() {
       ctx!.fillRect(light.x - 120, light.y - 120, 240, 240);
     }
 
+    // ---- 流星雨：持续高频生成，偶发小爆发 ----
+    if (!reduced) {
+      spawnTimer -= dt;
+      if (spawnTimer <= 0) {
+        spawnMeteor();
+        if (Math.random() < 0.4) {
+          spawnMeteor();
+          if (Math.random() < 0.35) spawnMeteor();
+        }
+        spawnTimer = 0.22 + Math.random() * 0.42; // 0.22~0.64s 一波
+      }
+    }
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      const m = meteors[i];
+      m.life += dt;
+      m.x += m.vx * dt;
+      m.y += m.vy * dt;
+      const k = m.life / m.ttl;
+      if (k >= 1 || m.y > H + 220 || m.x > W + 260) {
+        meteors.splice(i, 1);
+        continue;
+      }
+      const alpha = k < 0.18 ? k / 0.18 : 1 - (k - 0.18) / 0.82;
+      const sp = Math.hypot(m.vx, m.vy) || 1;
+      const tx = m.x - (m.vx / sp) * m.len;
+      const ty = m.y - (m.vy / sp) * m.len;
+      const grad = ctx!.createLinearGradient(tx, ty, m.x, m.y);
+      grad.addColorStop(0, 'rgba(190, 210, 255, 0)');
+      grad.addColorStop(0.75, `rgba(205, 224, 255, ${0.38 * alpha})`);
+      grad.addColorStop(1, `rgba(240, 246, 255, ${0.92 * alpha})`);
+      ctx!.strokeStyle = grad;
+      ctx!.lineWidth = 1.6;
+      ctx!.lineCap = 'round';
+      ctx!.beginPath();
+      ctx!.moveTo(tx, ty);
+      ctx!.lineTo(m.x, m.y);
+      ctx!.stroke();
+      ctx!.globalAlpha = Math.min(1, alpha);
+      ctx!.drawImage(sprite, m.x - 7, m.y - 7, 14, 14);
+      ctx!.globalAlpha = 1;
+    }
+
+    // ---- 点击涟漪：玻璃圆环扩散 ----
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      const rp = ripples[i];
+      rp.life += dt;
+      const k = rp.life / rp.ttl;
+      if (k >= 1) { ripples.splice(i, 1); continue; }
+      const fade = 1 - k;
+      const rad = 12 + k * 115;
+      ctx!.strokeStyle = `rgba(205, 224, 255, ${0.34 * fade})`;
+      ctx!.lineWidth = 1.5;
+      ctx!.beginPath();
+      ctx!.arc(rp.x, rp.y, rad, 0, Math.PI * 2);
+      ctx!.stroke();
+      ctx!.strokeStyle = `rgba(228, 238, 255, ${0.18 * fade})`;
+      ctx!.lineWidth = 1;
+      ctx!.beginPath();
+      ctx!.arc(rp.x, rp.y, rad * 0.62, 0, Math.PI * 2);
+      ctx!.stroke();
+    }
+
+    // ---- 星尘粒子 ----
     for (const p of particles) {
       if (!reduced) {
-        // 锚点缓慢漂移
         const anx = p.ax + Math.cos(t * p.speed + p.phase) * p.amp;
         const any = p.ay + Math.sin(t * p.speed * 0.9 + p.phase * 1.7) * p.amp;
-        // 弹簧回锚（自稳定） + 阻尼
         p.vx += (anx - p.x) * SPRING;
         p.vy += (any - p.y) * SPRING;
-        // 鼠标影响：近距离推开 + 尾流拖拽
         if (mouse.on) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
@@ -134,7 +262,6 @@ export function initParticles() {
         p.y += p.vy;
       }
       const twinkle = reduced ? 1 : 0.65 + 0.35 * Math.sin(t * p.tw + p.phase);
-      // 手电范围内的粒子被照亮、微微放大
       let boost = 1;
       if (light.a > 0.01) {
         const dx = p.x - light.x;

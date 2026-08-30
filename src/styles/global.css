@@ -63,6 +63,9 @@ body::before {
   inset: 0;
   z-index: -2;
   background: url('/images/bg.jpg') center / cover no-repeat;
+  /* 鼠标/陀螺仪视差（幅度很轻），scale 防止边缘露底 */
+  transform: translate3d(var(--bg-px, 0px), var(--bg-py, 0px), 0) scale(1.04);
+  will-change: transform;
 }
 /* 可读性薄纱 */
 body::after {
