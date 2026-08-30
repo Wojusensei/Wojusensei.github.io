@@ -1,0 +1,76 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+
+const contacts = [
+  { key: 'github', label: 'GitHub', value: 'github.com/Wojusensei', href: site.socials.github, icon: 'github', copy: site.socials.github },
+  { key: 'qq', label: 'QQ', value: site.socials.qq, href: '', icon: 'qq', copy: site.socials.qq },
+  { key: 'bilibili', label: 'Bilibili', value: 'space.bilibili.com/1161546725', href: site.socials.bilibili, icon: 'bilibili', copy: site.socials.bilibili },
+  { key: 'email', label: '邮箱', value: site.socials.email, href: `mailto:${site.socials.email}`, icon: 'mail', copy: site.socials.email },
+];
+---
+<Base active="about" title="关于" desc={`关于 ${site.name}`}>
+  <section class="section wrap" style="margin-top:24px;max-width:820px">
+    <div class="section-head">
+      <h1 class="section-title" data-i18n="about.title">关于我</h1>
+    </div>
+
+    <div class="g-card" style="margin-bottom:18px">
+      <p style="line-height:1.9;margin:0" data-i18n="about.p1">我叫窝居，很懒很宅</p>
+    </div>
+
+    <div class="g-card" style="margin-bottom:18px">
+      <h2 class="section-title" style="font-size:1.2rem" data-i18n="about.skillsTitle">常用技术</h2>
+      <div class="chips" data-i18n-list="about.skills">
+        {['Python', 'TypeScript', 'Rust', 'Go', 'Node.js', 'Git', 'NoneBot2', 'SQL'].map((s) => (
+          <span class="tag">{s}</span>
+        ))}
+      </div>
+    </div>
+
+    <div class="g-card" style="margin-bottom:18px">
+      <h2 class="section-title" style="font-size:1.2rem" data-i18n="about.contactTitle">联系方式</h2>
+      <div class="contact-list">
+        {contacts.map((c) => (
+          <div class="g-card contact-item" style="border-radius:16px;padding:12px 16px;box-shadow:none">
+            <span class="ci-icon"><Icon name={c.icon} /></span>
+            <span class="ci-label" data-i18n={`about.${c.key}`}>{c.label}</span>
+            {c.href ? (
+              <a class="ci-value" href={c.href} target="_blank" rel="noopener">{c.value}</a>
+            ) : (
+              <span class="ci-value">{c.value}</span>
+            )}
+            <button class="g-btn copy-btn" data-copy={c.copy} data-i18n="about.copy">复制</button>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="g-card donate-card">
+      <h2 class="section-title" style="font-size:1.2rem" data-i18n="about.donateTitle">支持我</h2>
+      <p class="section-desc" data-i18n="about.donateDesc">你的打赏是我发电的动力 ⚡</p>
+      <p style="margin-top:16px">
+        <button class="g-btn primary" data-donate-open aria-expanded="false" aria-haspopup="dialog">
+          <Icon name="heart" /><span data-i18n="home.donateBtn">打赏一下</span>
+        </button>
+      </p>
+    </div>
+  </section>
+</Base>
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const locale = (localStorage.getItem('woju-lang') as 'zh' | 'en') || 'zh';
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy!);
+        const t = (await import('../i18n/ui')).getT(locale).about.copied;
+        const old = btn.textContent;
+        btn.textContent = t;
+        setTimeout(() => (btn.textContent = old), 1600);
+      } catch {
+        /* 剪贴板不可用时静默失败 */
+      }
+    });
+  });
+</script>

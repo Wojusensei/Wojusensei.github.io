@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+
+interface Props { active?: string; }
+const { active = '' } = Astro.props;
+
+const nav = [
+  { key: 'home', href: '/' },
+  { key: 'works', href: '/works/' },
+  { key: 'contributions', href: '/contributions/' },
+  { key: 'blog', href: '/blog/' },
+  { key: 'about', href: '/about/' },
+];
+---
+<header class="site-header">
+  <div class="bar">
+    <a class="logo" href="/"><Icon name="droplet" />Wojusensei</a>
+    <nav class="nav-links" id="nav-links">
+      {nav.map((n) => (
+        <a href={n.href} class:list={[{ active: active === n.key }]} data-i18n={`nav.${n.key}`}>
+          {{ home: '首页', works: '作品', contributions: '贡献', blog: '博客', about: '关于' }[n.key]}
+        </a>
+      ))}
+    </nav>
+    <div class="header-controls">
+      <button id="lang-toggle" class="g-btn pill" aria-label="切换语言" data-i18n-attr="aria-label:misc.langToggle">EN</button>
+      <button id="theme-toggle" class="g-btn icon" aria-label="切换亮暗" data-i18n-attr="aria-label:misc.themeToggle">
+        <span class="i-sun"><Icon name="sun" /></span>
+        <span class="i-moon"><Icon name="moon" /></span>
+      </button>
+      <button class="g-btn icon menu-toggle" id="menu-toggle" aria-label="菜单"><Icon name="menu" /></button>
+    </div>
+  </div>
+</header>
+<script>
+  document.getElementById('menu-toggle')?.addEventListener('click', () => {
+    document.getElementById('nav-links')?.classList.toggle('open');
+  });
+</script>

@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import WorkCard from '../components/WorkCard.astro';
+import { works } from '../data/works';
+---
+<Base active="works" title="作品" desc="Wojusensei 在 GitHub 上的开源项目">
+  <section class="section wrap" style="margin-top:24px">
+    <div class="section-head">
+      <h1 class="section-title" data-i18n="works.title">作品</h1>
+      <p class="section-desc" data-i18n="works.subtitle">GitHub 上的开源项目，点卡片可以跳转到仓库</p>
+    </div>
+    <div class="grid cols-3">
+      {works.map((w) => <WorkCard work={w} />)}
+    </div>
+  </section>
+</Base>

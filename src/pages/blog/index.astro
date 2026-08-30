@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+<Base active="blog" title="博客" desc="Wojusensei 的博客：技术笔记、开发日志与随想">
+  <section class="section wrap" style="margin-top:24px">
+    <div class="section-head">
+      <h1 class="section-title" data-i18n="blog.title">博客</h1>
+      <p class="section-desc" data-i18n="blog.subtitle">技术笔记、开发日志与随想</p>
+    </div>
+    {posts.length === 0 ? (
+      <p class="section-desc" data-i18n="blog.empty">还没有文章，第一篇正在路上。</p>
+    ) : (
+      <div class="grid cols-2">
+        {posts.map((p) => (
+          <a class="g-card post-item" href={`/blog/${p.id}/`}>
+            <span class="meta">
+              {p.data.date.toISOString().slice(0, 10)}
+              {p.data.tags?.length ? ` · ${p.data.tags.join(' / ')}` : ''}
+            </span>
+            <h3>{p.data.title}</h3>
+            <p>{p.data.description}</p>
+            <span class="go" data-i18n="blog.readMore">继续阅读 →</span>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+</Base>

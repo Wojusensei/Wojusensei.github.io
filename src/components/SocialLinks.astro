@@ -1,0 +1,19 @@
+---
+// 社交联系方式区：GitHub / QQ / Bilibili / Email（配置见 src/data/site.ts）
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+---
+<div class="social-row">
+  <a class="g-btn icon" href={site.socials.github} target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+    <Icon name="github" />
+  </a>
+  <a class="g-btn icon" href={`http://wpa.qq.com/msgrd?v=3&uin=${site.socials.qq}&site=qq&menu=yes`} target="_blank" rel="noopener" aria-label="QQ" title={`QQ: ${site.socials.qq}`}>
+    <Icon name="qq" />
+  </a>
+  <a class="g-btn icon" href={site.socials.bilibili} target="_blank" rel="noopener" aria-label="Bilibili" title="Bilibili">
+    <Icon name="bilibili" />
+  </a>
+  <a class="g-btn icon" href={`mailto:${site.socials.email}`} aria-label="Email" title={site.socials.email}>
+    <Icon name="mail" />
+  </a>
+</div>

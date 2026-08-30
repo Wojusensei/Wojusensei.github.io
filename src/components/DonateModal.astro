@@ -1,0 +1,79 @@
+---
+import { site } from '../data/site';
+---
+<div class="modal" id="donate-modal" role="dialog" aria-modal="true" aria-label="donate">
+  <div class="sheet">
+    <button class="g-btn icon close-x" data-donate-close aria-label="close">✕</button>
+    <h3 class="section-title" style="text-align:center" data-i18n="donate.title">打赏</h3>
+    <p class="section-desc" style="text-align:center;max-width:34ch;margin-inline:auto" data-i18n="donate.desc">
+      善待留守儿童，多点关心多点爱
+    </p>
+    <div class="amount-row">
+      {site.donate.amounts.map((a) => (
+        <button class="g-btn amount-chip" data-amount={a}>¥{a}</button>
+      ))}
+      <button class="g-btn amount-chip" data-amount="custom" data-i18n="donate.custom">自定义</button>
+    </div>
+    <p class="donate-note" id="donate-note" data-i18n="donate.presetNote">推荐金额</p>
+    <div class="qr-tabs">
+      <button class="g-btn pill" data-qr={site.donate.wechatQR} aria-pressed="true" data-i18n="donate.wechat">微信赞赏码</button>
+      <button class="g-btn pill" data-qr={site.donate.alipayQR} aria-pressed="false" data-i18n="donate.alipay">支付宝</button>
+    </div>
+    <div class="qr-stage">
+      <img id="donate-qr" src={site.donate.wechatQR} alt="赞赏码 / 收款码" />
+    </div>
+    {site.donate.afdian && (
+      <p style="text-align:center;margin:10px 0 0">
+        <a class="g-btn pill primary" href={site.donate.afdian} target="_blank" rel="noopener" data-i18n="donate.afdian">爱发电</a>
+      </p>
+    )}
+  </div>
+</div>
+<script>
+  import { getT } from '../i18n/ui';
+
+  const modal = document.getElementById('donate-modal')!;
+  const note = document.getElementById('donate-note')!;
+  const qr = document.getElementById('donate-qr') as HTMLImageElement;
+  let currentAmount: string | null = null;
+
+  const t = () => getT((localStorage.getItem('woju-lang') as 'zh' | 'en') || 'zh').donate;
+
+  function updateNote() {
+    if (!currentAmount) { note.textContent = t().presetNote; return; }
+    note.textContent =
+      currentAmount === 'custom' ? t().customNote : `¥${currentAmount} · ${t().customNote}`;
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.amount-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll<HTMLButtonElement>('.amount-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+      chip.setAttribute('aria-pressed', 'true');
+      currentAmount = chip.dataset.amount ?? null;
+      updateNote();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-qr]').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll<HTMLButtonElement>('[data-qr]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      tab.setAttribute('aria-pressed', 'true');
+      qr.src = tab.dataset.qr!;
+    });
+  });
+
+  function open() {
+    updateNote();
+    modal.classList.add('open');
+    document.querySelectorAll<HTMLButtonElement>('[data-donate-open]').forEach((b) => b.setAttribute('aria-expanded', 'true'));
+  }
+  function close() {
+    modal.classList.remove('open');
+    document.querySelectorAll<HTMLButtonElement>('[data-donate-open]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+  }
+
+  document.querySelectorAll('[data-donate-open]').forEach((b) => b.addEventListener('click', open));
+  document.querySelectorAll('[data-donate-close]').forEach((b) => b.addEventListener('click', close));
+  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+</script>

@@ -1,0 +1,7 @@
+---
+import { site } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div>© {year} {site.name} · <span data-i18n="footer.built">由 Astro 构建 · 托管于 GitHub Pages</span></div>
+</footer>

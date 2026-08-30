@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+<Base active="blog" title={post.data.title} desc={post.data.description}>
+  <article class="section wrap" style="margin-top:24px;max-width:820px">
+    <a href="/blog/" data-i18n="blog.back">← 返回列表</a>
+    <header class="post-header" style="margin-top:16px">
+      <h1>{post.data.title}</h1>
+      <div class="post-meta">
+        <span>{post.data.date.toISOString().slice(0, 10)}</span>
+        {post.data.tags?.map((t) => <span>#{t}</span>)}
+      </div>
+    </header>
+    <div class="g-card" style="padding:36px clamp(20px,4vw,44px)">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</Base>
