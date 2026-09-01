@@ -4,12 +4,14 @@
 import { initCardLensFilter } from './cardFilter';
 import { initParticles } from './particles';
 import { initTilt } from './tilt';
+import { initBaFx } from './ba-fx';
 import { initTheme, initLang } from '../toggles';
 
 function start() {
   initCardLensFilter();
   initParticles();
   initTilt();
+  initBaFx();
   initTheme();
   initLang();
 }
