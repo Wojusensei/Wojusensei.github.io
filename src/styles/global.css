@@ -263,6 +263,7 @@ html.lens-ok .site-header .bar::before {
 .g-btn:active { transform: scale(0.96); }
 .g-btn.icon { width: 40px; height: 40px; padding: 0; font-size: 1rem; }
 .g-btn.pill { height: 40px; padding: 0 16px; font-size: 0.88rem; }
+.g-btn.lg { height: 48px; padding: 0 30px; font-size: 1rem; letter-spacing: 0.02em; }
 .g-btn.primary {
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 85%, #fff 0%), var(--accent-2));
   border-color: rgba(255, 255, 255, 0.35);
