@@ -68,7 +68,7 @@ export const dict = {
   },
   about: {
     title: '关于我',
-    p1: '我叫窝居，很懒很宅',
+    p1: '我叫窝居，一名车万人、蔚蓝档案忠实玩家、爱摸鱼的游戏开发者。',
     p2: '这个站点本身也是一次折腾的产物：Astro + WebGL 液态玻璃渲染 + Matter.js 物理引擎，页面上的每一颗玻璃液滴都是真实的折射与碰撞。',
     skillsTitle: '常用技术',
     skills: ['Python', 'TypeScript', 'Rust', 'Go', 'Node.js', 'Git', 'NoneBot2', 'SQL'],
@@ -171,7 +171,7 @@ export const dict = {
     },
     about: {
       title: 'About Me',
-      p1: "My name is Woju. Very lazy, very much a homebody.",
+      p1: "I go by Woju — a Touhou fan, a devoted Blue Archive player, and a game developer who loves slacking off.",
       p2: 'This site is one of those experiments: Astro + WebGL liquid-glass rendering + a Matter.js physics engine. Every glass droplet here refracts and collides for real.',
       skillsTitle: 'Tech I use',
       skills: ['Python', 'TypeScript', 'Rust', 'Go', 'Node.js', 'Git', 'NoneBot2', 'SQL'],
