@@ -45,6 +45,19 @@ html[data-theme='dark'] {
 html { scroll-behavior: smooth; }
 html, body { margin: 0; padding: 0; }
 
+/* 蔚蓝档案像素光标（指针本体来自 BA-Pointer 项目，经站长手工抠图） */
+html {
+  cursor: url('/cursors/ba-pointer.png') 5 4, auto;
+}
+a, button, [role='button'], .g-btn, label, select, summary {
+  cursor: url('/cursors/ba-pointer.png') 5 4, pointer;
+}
+input:not([type='checkbox']):not([type='radio']),
+textarea,
+[contenteditable='true'] {
+  cursor: url('/cursors/text.cur') 15 15, text;
+}
+
 body {
   font-family: var(--font);
   color: var(--text);
