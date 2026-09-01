@@ -9,6 +9,7 @@ const nav = [
   { key: 'works', href: '/works/' },
   { key: 'contributions', href: '/contributions/' },
   { key: 'blog', href: '/blog/' },
+  { key: 'friends', href: '/friends/' },
   { key: 'about', href: '/about/' },
 ];
 ---
@@ -18,7 +19,7 @@ const nav = [
     <nav class="nav-links" id="nav-links">
       {nav.map((n) => (
         <a href={n.href} class:list={[{ active: active === n.key }]} data-i18n={`nav.${n.key}`}>
-          {{ home: '首页', works: '作品', contributions: '贡献', blog: '博客', about: '关于' }[n.key]}
+          {{ home: '首页', works: '作品', contributions: '贡献', blog: '博客', friends: '友链', about: '关于' }[n.key]}
         </a>
       ))}
     </nav>

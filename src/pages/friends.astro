@@ -1,0 +1,82 @@
+---
+// 友链页：玻璃卡片墙 + 本站信息（供交换友链）
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { friends } from '../data/friends';
+import { site } from '../data/site';
+
+const siteInfo = {
+  name: site.name,
+  url: site.url,
+  desc: '喜好后端开发、同人游戏制作',
+  image: site.url + '/favicon.svg',
+};
+---
+<Base active="friends" title="友链" desc="Wojusensei 的朋友们">
+  <section class="section wrap" style="margin-top:24px">
+    <div class="section-head">
+      <h1 class="section-title" data-i18n="friends.title">友情链接</h1>
+      <p class="section-desc" data-i18n="friends.subtitle">车万人与蔚蓝档案的同好们</p>
+    </div>
+
+    <div class="grid cols-2">
+      {friends.map((f) => (
+        <a class="g-card friend-card" href={f.url} target="_blank" rel="noopener">
+          <img class="fc-avatar" src={f.avatar} alt={f.name} loading="lazy" />
+          <div class="fc-body">
+            <h3>{f.name}</h3>
+            <p>{f.desc}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <div class="section-head" style="margin:52px 0 14px">
+      <h2 class="section-title" style="font-size:1.2rem" data-i18n="friends.joinTitle">申请友链</h2>
+      <p class="section-desc" data-i18n="friends.joinDesc">
+        先把本站添加到您的网站上，然后通过页面底部的 QQ 或邮箱联系我，附上您的站点信息即可。
+      </p>
+    </div>
+    <div class="g-card">
+      <div class="contact-list">
+        <div class="g-card contact-item" style="border-radius:16px;padding:12px 16px;box-shadow:none">
+          <span class="ci-label" data-i18n="friends.fName">名字</span>
+          <span class="ci-value">{siteInfo.name}</span>
+          <button class="g-btn copy-btn" data-copy={siteInfo.name} data-i18n="about.copy">复制</button>
+        </div>
+        <div class="g-card contact-item" style="border-radius:16px;padding:12px 16px;box-shadow:none">
+          <span class="ci-label" data-i18n="friends.fUrl">网址</span>
+          <a class="ci-value" href={siteInfo.url} target="_blank" rel="noopener">{siteInfo.url}</a>
+          <button class="g-btn copy-btn" data-copy={siteInfo.url} data-i18n="about.copy">复制</button>
+        </div>
+        <div class="g-card contact-item" style="border-radius:16px;padding:12px 16px;box-shadow:none">
+          <span class="ci-label" data-i18n="friends.fDesc">描述</span>
+          <span class="ci-value">{siteInfo.desc}</span>
+          <button class="g-btn copy-btn" data-copy={siteInfo.desc} data-i18n="about.copy">复制</button>
+        </div>
+        <div class="g-card contact-item" style="border-radius:16px;padding:12px 16px;box-shadow:none">
+          <span class="ci-label" data-i18n="friends.fImage">头像</span>
+          <a class="ci-value" href={siteInfo.image} target="_blank" rel="noopener">{siteInfo.image}</a>
+          <button class="g-btn copy-btn" data-copy={siteInfo.image} data-i18n="about.copy">复制</button>
+        </div>
+      </div>
+      <p style="margin:14px 0 0;text-align:center">
+        <a class="g-btn primary" href="/about/" data-i18n="friends.contactCta">前往联系方式</a>
+      </p>
+    </div>
+  </section>
+</Base>
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const locale = (localStorage.getItem('woju-lang') as 'zh' | 'en') || 'zh';
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy!);
+        const t = (await import('../i18n/ui')).getT(locale).about.copied;
+        const old = btn.textContent;
+        btn.textContent = t;
+        setTimeout(() => (btn.textContent = old), 1600);
+      } catch { /* 剪贴板不可用时静默失败 */ }
+    });
+  });
+</script>

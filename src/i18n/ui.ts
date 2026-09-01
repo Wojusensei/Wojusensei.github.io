@@ -2,7 +2,19 @@
 export type Locale = 'zh' | 'en';
 
 export const dict = {
-  nav: { home: '首页', works: '作品', contributions: '贡献', blog: '博客', about: '关于' },
+  nav: { home: '首页', works: '作品', contributions: '贡献', blog: '博客', friends: '友链', about: '关于' },
+  friends: {
+    title: '友情链接',
+    subtitle: '车万人与蔚蓝档案的同好们',
+    joinTitle: '申请友链',
+    joinDesc:
+      '先把本站添加到您的网站上，然后通过页面底部的 QQ 或邮箱联系我，附上您的站点信息即可。',
+    fName: '名字',
+    fUrl: '网址',
+    fDesc: '描述',
+    fImage: '头像',
+    contactCta: '前往联系方式',
+  },
   contrib: {
     title: '贡献',
     reposTitle: '贡献过的高星仓库',
@@ -93,7 +105,19 @@ export const dict = {
     backHome: '回首页',
   },
   en: {
-    nav: { home: 'Home', works: 'Works', contributions: 'Contributions', blog: 'Blog', about: 'About' },
+    nav: { home: 'Home', works: 'Works', contributions: 'Contributions', blog: 'Blog', friends: 'Friends', about: 'About' },
+    friends: {
+      title: 'Friend Links',
+      subtitle: 'Friends from Touhou & Blue Archive communities',
+      joinTitle: 'Apply for a Friend Link',
+      joinDesc:
+        'Add this site to your website first, then reach me via the QQ or email at the bottom of the page with your site info.',
+      fName: 'Name',
+      fUrl: 'URL',
+      fDesc: 'Description',
+      fImage: 'Avatar',
+      contactCta: 'Contact me',
+    },
     contrib: {
       title: 'Contributions',
       reposTitle: 'High-star Repositories Contributed To',
@@ -194,6 +218,7 @@ export const zh = {
   works: dict.works,
   contrib: dict.contrib,
   blog: dict.blog,
+  friends: dict.friends,
   about: dict.about,
   donate: dict.donate,
   footer: dict.footer,
