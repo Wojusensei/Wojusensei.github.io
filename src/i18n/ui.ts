@@ -33,6 +33,7 @@ export const dict = {
     viewPr: '查看 PR →',
     mergedTag: '已合并',
     openTag: '待审',
+    closedTag: '未合并',
   },
   hero: {
     greeting: 'HI THERE！I\'M',
@@ -139,6 +140,7 @@ export const dict = {
       viewPr: 'View PR →',
       mergedTag: 'merged',
       openTag: 'open',
+      closedTag: 'closed',
     },
     hero: {
       greeting: "HI THERE！I'M",

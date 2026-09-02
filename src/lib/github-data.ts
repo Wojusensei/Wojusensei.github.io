@@ -64,6 +64,8 @@ export interface PullRequest {
   title: string;
   url: string;
   merged: boolean;
+  /** PR 当前状态：open=待审，closed=已关闭（配合 merged=false 即被拒绝） */
+  state?: 'open' | 'closed';
 }
 
 export interface GhStats {
@@ -150,6 +152,7 @@ export async function fetchGhStats(): Promise<GhStats> {
     title: i.title,
     url: i.html_url,
     merged: !!(i.pull_request?.merged_at),
+    state: i.state === 'open' ? 'open' : 'closed',
   }));
 
   return {

@@ -14,6 +14,20 @@ export const contributions = {
           url: 'https://github.com/python/cpython/pull/153263',
           merged: true,
         },
+        {
+          number: 152994,
+          title: "gh-152798: Revert sys.thread_info.lock to 'semaphore'/None for consistency",
+          url: 'https://github.com/python/cpython/pull/152994',
+          merged: false,
+          state: 'closed',
+        },
+        {
+          number: 152970,
+          title: 'gh-152959: Fix IndexError when <key> appears outside <dict>',
+          url: 'https://github.com/python/cpython/pull/152970',
+          merged: false,
+          state: 'closed',
+        },
       ],
     },
     {

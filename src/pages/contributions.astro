@@ -45,7 +45,7 @@ const pieSlices = (() => {
 // cpython PR：实时列表为空时回退到静态兜底（contributions.ts 的 fallbackPrs）
 const fallback = (
   contributions.repos.find((r) => 'fallbackPrs' in r) as
-    | { fallbackPrs: { number: number; title: string; url: string; merged: boolean }[] }
+    | { fallbackPrs: { number: number; title: string; url: string; merged: boolean; state?: string }[] }
     | undefined
 )?.fallbackPrs ?? [];
 const cpythonPrs = stats.cpythonPrs.length ? stats.cpythonPrs : fallback;
@@ -140,9 +140,11 @@ const repos = contributions.repos.map((r) => ({
               <ul class="pr-list">
                 {cpythonPrs.map((pr) => (
                   <li>
-                    <span class={`pr-badge ${pr.merged ? 'merged' : 'open'}`}>
-                      <span data-lang-zh>{pr.merged ? '已合并' : '待审'}</span>
-                      <span data-lang-en style={pr.merged ? 'display:none' : ''}>{pr.merged ? 'merged' : 'open'}</span>
+                    <span class={`pr-badge ${pr.merged ? 'merged' : pr.state === 'closed' ? 'closed' : 'open'}`}>
+                      <span data-lang-zh>{pr.merged ? '已合并' : pr.state === 'closed' ? '未合并' : '待审'}</span>
+                      <span data-lang-en style={pr.merged || pr.state === 'closed' ? 'display:none' : ''}>
+                        {pr.merged ? 'merged' : pr.state === 'closed' ? 'closed' : 'open'}
+                      </span>
                     </span>
                     <a href={pr.url} target="_blank" rel="noopener">#{pr.number} {pr.title}</a>
                   </li>
