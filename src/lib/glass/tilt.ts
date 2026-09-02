@@ -5,6 +5,18 @@
 
 const LERP = 0.09; // 插值速度：越小越沉稳
 
+// getBoundingClientRect 每次调用都强制布局；
+// pointermove 一帧可能触发多次，这里按 ~一帧的时间窗缓存，密集移动时只读一次
+const rectCache = new WeakMap<HTMLElement, { at: number; rect: DOMRect }>();
+function getRect(el: HTMLElement): DOMRect {
+  const now = performance.now();
+  const cached = rectCache.get(el);
+  if (cached && now - cached.at < 32) return cached.rect;
+  const rect = el.getBoundingClientRect();
+  rectCache.set(el, { at: now, rect });
+  return rect;
+}
+
 interface TiltState {
   el: HTMLElement;
   rx: number; ry: number; lift: number;       // 当前
@@ -67,7 +79,7 @@ export function initTilt() {
 
     el.addEventListener('pointermove', (e) => {
       if (e.pointerType !== 'mouse') return;
-      const r = el.getBoundingClientRect();
+      const r = getRect(el);
       const nx = ((e.clientX - r.left) / r.width) * 2 - 1;  // -1..1
       const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
       if (s.pressing) {
@@ -94,7 +106,7 @@ export function initTilt() {
       if (e.pointerType !== 'mouse') return;
       s.pressing = true;
       // 立即产生一次下垂趋势
-      const r = el.getBoundingClientRect();
+      const r = getRect(el);
       const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
       const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
       s.try_ = nx * 5;
