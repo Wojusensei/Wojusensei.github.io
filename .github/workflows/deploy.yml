@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    # 每 6 小时重建一次：刷新构建时抓取的数据（友链头像等 GitHub 数据）
+    - cron: '0 */6 * * *'
 
 permissions:
   contents: read
