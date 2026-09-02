@@ -1,0 +1,36 @@
+---
+import Icon from './Icon.astro';
+---
+<button id="back-top" class="g-btn back-top" aria-label="回到顶部" data-i18n-attr="aria-label:misc.backTop">
+  <Icon name="up" />
+</button>
+<script>
+  // 往下滑过阈值出现，点击平滑回顶并消失；再次下滑重新出现
+  // 挂 astro:page-load：每次导航后按钮 DOM 被替换，需重新绑定（scrollY 归零，初始隐藏）
+  document.addEventListener('astro:page-load', () => {
+    const btn = document.getElementById('back-top');
+    if (!btn) return;
+
+    const THRESHOLD = 320;
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      btn.classList.toggle('show', window.scrollY > THRESHOLD);
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    btn.addEventListener('click', () => {
+      btn.classList.remove('show');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    });
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  });
+</script>

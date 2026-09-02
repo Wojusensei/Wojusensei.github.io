@@ -104,6 +104,7 @@ export const dict = {
     langToggle: '切换语言',
     page404: '这一页掉进液态玻璃里了',
     backHome: '回首页',
+    backTop: '回到顶部',
   },
   en: {
     nav: { home: 'Home', works: 'Works', contributions: 'Contributions', blog: 'Blog', friends: 'Friends', about: 'About' },
@@ -208,6 +209,7 @@ export const dict = {
       langToggle: 'Toggle language',
       page404: 'This page fell into the liquid glass',
       backHome: 'Back home',
+      backTop: 'Back to top',
     },
   },
 } as const;

@@ -688,3 +688,34 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   ::view-transition-old(root),
   ::view-transition-new(root) { animation: none; }
 }
+
+/* ---------- 返回顶部玻璃按钮 ---------- */
+.back-top {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 60;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--text);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1),
+    visibility 0s linear 0.28s, background-color 0.3s ease, border-color 0.6s ease;
+}
+.back-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1),
+    background-color 0.3s ease, border-color 0.6s ease;
+}
+.back-top svg { width: 20px; height: 20px; }
+.back-top:hover { transform: translateY(-2px); }
+.back-top:active { transform: scale(0.94); }
+@media (max-width: 640px) {
+  .back-top { right: 16px; bottom: 16px; width: 42px; height: 42px; }
+}

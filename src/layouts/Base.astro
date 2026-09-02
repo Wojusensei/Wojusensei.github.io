@@ -4,6 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import DonateModal from '../components/DonateModal.astro';
+import BackToTop from '../components/BackToTop.astro';
 import { site } from '../data/site';
 
 interface Props { title?: string; desc?: string; active?: string; }
@@ -47,6 +48,7 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     </main>
     <Footer />
     <DonateModal />
+    <BackToTop />
     <script>
       import '../lib/glass/main';
     </script>
