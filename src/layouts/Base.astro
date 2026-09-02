@@ -20,6 +20,8 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     <meta name="description" content={desc} />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- 星空底图在 CSS 里引用，preload 让它更早开始下载（首屏 LCP） -->
+    <link rel="preload" as="image" href="/images/bg.webp" fetchpriority="high" />
     <ClientRouter />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:site_name" content={site.name} />
