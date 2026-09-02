@@ -78,4 +78,18 @@ import { site } from '../data/site';
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') document.getElementById('donate-modal')?.classList.remove('open');
   });
+
+  // 预载两张收款码：此前支付宝码在首次点击时才开始下载解码，切换会卡一下；
+  // 页面空闲时提前拉取，之后切换零延迟
+  const preload = () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-qr]').forEach((tab) => {
+      const img = new Image();
+      img.src = tab.dataset.qr!;
+    });
+  };
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(preload, { timeout: 4000 });
+  } else {
+    setTimeout(preload, 3000);
+  }
 </script>
