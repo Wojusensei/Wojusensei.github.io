@@ -21,6 +21,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Install, build, and upload site
         uses: withastro/action@v3
+        with:
+          # Astro 7 要求 Node >= 22.12
+          node-version: 22
         env:
           # 构建时抓取 GitHub 数据（star / commit / PR 统计）；令牌只存在于此，不进入前端
           # （GitHub 禁止 Secret 名以 GITHUB_ 开头，故仓库名为 GH_DATA_TOKEN，这里映射回代码读取的变量名）
