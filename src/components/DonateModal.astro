@@ -32,48 +32,50 @@ import { site } from '../data/site';
 <script>
   import { getT } from '../i18n/ui';
 
-  const modal = document.getElementById('donate-modal')!;
-  const note = document.getElementById('donate-note')!;
-  const qr = document.getElementById('donate-qr') as HTMLImageElement;
-  let currentAmount: string | null = null;
-
+  // 全部用 document 级事件委托：只绑定一次，跨页面导航（View Transitions）后依然有效
   const t = () => getT((localStorage.getItem('woju-lang') as 'zh' | 'en') || 'zh').donate;
 
-  function updateNote() {
-    if (!currentAmount) { note.textContent = t().presetNote; return; }
-    note.textContent =
-      currentAmount === 'custom' ? t().customNote : `¥${currentAmount} · ${t().customNote}`;
+  function noteText(modal: HTMLElement): string {
+    const amount = modal.dataset.amount;
+    if (!amount) return t().presetNote;
+    return amount === 'custom' ? t().customNote : `¥${amount} · ${t().customNote}`;
   }
 
-  document.querySelectorAll<HTMLButtonElement>('.amount-chip').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll<HTMLButtonElement>('.amount-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+  document.addEventListener('click', (e) => {
+    const el = e.target as HTMLElement;
+    const modal = document.getElementById('donate-modal');
+    if (!modal) return;
+
+    if (el.closest('[data-donate-open]')) {
+      modal.querySelector<HTMLElement>('#donate-note')!.textContent = noteText(modal);
+      modal.classList.add('open');
+      document.querySelectorAll<HTMLButtonElement>('[data-donate-open]').forEach((b) => b.setAttribute('aria-expanded', 'true'));
+      return;
+    }
+    if (el.closest('[data-donate-close]') || el.id === 'donate-modal') {
+      modal.classList.remove('open');
+      document.querySelectorAll<HTMLButtonElement>('[data-donate-open]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+      return;
+    }
+
+    const chip = el.closest<HTMLElement>('.amount-chip');
+    if (chip) {
+      modal.querySelectorAll<HTMLButtonElement>('.amount-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
       chip.setAttribute('aria-pressed', 'true');
-      currentAmount = chip.dataset.amount ?? null;
-      updateNote();
-    });
-  });
+      modal.dataset.amount = chip.dataset.amount ?? '';
+      modal.querySelector<HTMLElement>('#donate-note')!.textContent = noteText(modal);
+      return;
+    }
 
-  document.querySelectorAll<HTMLButtonElement>('[data-qr]').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll<HTMLButtonElement>('[data-qr]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    const tab = el.closest<HTMLElement>('[data-qr]');
+    if (tab) {
+      modal.querySelectorAll<HTMLButtonElement>('[data-qr]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
       tab.setAttribute('aria-pressed', 'true');
-      qr.src = tab.dataset.qr!;
-    });
+      modal.querySelector<HTMLImageElement>('#donate-qr')!.src = tab.dataset.qr!;
+    }
   });
 
-  function open() {
-    updateNote();
-    modal.classList.add('open');
-    document.querySelectorAll<HTMLButtonElement>('[data-donate-open]').forEach((b) => b.setAttribute('aria-expanded', 'true'));
-  }
-  function close() {
-    modal.classList.remove('open');
-    document.querySelectorAll<HTMLButtonElement>('[data-donate-open]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
-  }
-
-  document.querySelectorAll('[data-donate-open]').forEach((b) => b.addEventListener('click', open));
-  document.querySelectorAll('[data-donate-close]').forEach((b) => b.addEventListener('click', close));
-  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') document.getElementById('donate-modal')?.classList.remove('open');
+  });
 </script>

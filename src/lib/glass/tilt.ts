@@ -44,6 +44,9 @@ function wake() {
 }
 
 export function initTilt() {
+  // 跨页面导航重入：清掉上一页卡片的插值状态，避免数组无限增长
+  states.length = 0;
+  if (raf) { cancelAnimationFrame(raf); raf = 0; }
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!window.matchMedia('(hover: hover)').matches) return; // 触屏不启用
 

@@ -59,18 +59,21 @@ const contacts = [
   </section>
 </Base>
 <script>
-  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const locale = (localStorage.getItem('woju-lang') as 'zh' | 'en') || 'zh';
-      try {
-        await navigator.clipboard.writeText(btn.dataset.copy!);
-        const t = (await import('../i18n/ui')).getT(locale).about.copied;
-        const old = btn.textContent;
-        btn.textContent = t;
-        setTimeout(() => (btn.textContent = old), 1600);
-      } catch {
-        /* 剪贴板不可用时静默失败 */
-      }
+  // 挂 astro:page-load：客户端导航后重新绑定（页面 DOM 会被整体替换）
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const locale = (localStorage.getItem('woju-lang') as 'zh' | 'en') || 'zh';
+        try {
+          await navigator.clipboard.writeText(btn.dataset.copy!);
+          const t = (await import('../i18n/ui')).getT(locale).about.copied;
+          const old = btn.textContent;
+          btn.textContent = t;
+          setTimeout(() => (btn.textContent = old), 1600);
+        } catch {
+          /* 剪贴板不可用时静默失败 */
+        }
+      });
     });
   });
 </script>

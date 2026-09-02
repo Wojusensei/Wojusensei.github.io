@@ -669,3 +669,22 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 }
 .plugin-row:last-child { border-bottom: none; }
 .plugin-row:hover { text-decoration: none; color: var(--link); }
+
+/* ---------- 页面切换衔接动画（Astro View Transitions） ---------- */
+/* Chromium 系（Edge/Chrome 走原生 View Transitions）：旧页快速淡出微上移，新页自下方轻轻浮入 */
+::view-transition-old(root) {
+  animation: woju-page-out 0.18s ease-in forwards;
+}
+::view-transition-new(root) {
+  animation: woju-page-in 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes woju-page-out {
+  to { opacity: 0; transform: translateY(-10px) scale(0.996); }
+}
+@keyframes woju-page-in {
+  from { opacity: 0; transform: translateY(14px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}

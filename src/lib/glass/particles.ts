@@ -1,5 +1,6 @@
 // 背景层：星尘粒子 + 手电跟随 + 流星雨（左上→右下）+ 鼠标视差 + 点击涟漪
 // 全部绘制在同一张画布上，会被液态玻璃卡片真实折射
+// 支持跨页面导航（View Transitions）：重复 init 前先完整拆掉上一份监听与动画循环
 
 interface Particle {
   x: number; y: number; vx: number; vy: number;
@@ -25,7 +26,12 @@ const MOUSE_RADIUS = 130;
 const SPRING = 0.014;
 const DAMPING = 0.9;
 
+let teardownPrev: (() => void) | null = null;
+
 export function initParticles() {
+  teardownPrev?.();
+  teardownPrev = null;
+
   const canvas = document.createElement('canvas');
   canvas.id = 'particle-canvas';
   document.body.prepend(canvas);
@@ -33,6 +39,15 @@ export function initParticles() {
   if (!ctx) return;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 统一登记监听器，teardown 时一次拆干净
+  const disposers: (() => void)[] = [];
+  const on = <K extends keyof WindowEventMap>(
+    target: EventTarget, type: K | string, fn: EventListenerOrEventListenerObject, opts?: AddEventListenerOptions,
+  ) => {
+    target.addEventListener(type, fn, opts);
+    disposers.push(() => target.removeEventListener(type, fn, opts));
+  };
 
   let W = 0, H = 0, dpr = 1;
   let particles: Particle[] = [];
@@ -107,7 +122,7 @@ export function initParticles() {
   const parallax = { tx: 0, ty: 0, x: 0, y: 0 };
 
   let lastMX = 0, lastMY = 0;
-  window.addEventListener('pointermove', (e) => {
+  on(window, 'pointermove', ((e: PointerEvent) => {
     mouse.vx = e.clientX - lastMX;
     mouse.vy = e.clientY - lastMY;
     lastMX = e.clientX; lastMY = e.clientY;
@@ -117,23 +132,23 @@ export function initParticles() {
     const ny = e.clientY / Math.max(H, 1) - 0.5;
     parallax.tx = nx * -14; // 反向漂移，幅度刻意很轻
     parallax.ty = ny * -9;
-  }, { passive: true });
-  window.addEventListener('pointerleave', () => { mouse.on = false; });
-  window.addEventListener('blur', () => { mouse.on = false; });
+  }) as EventListener, { passive: true });
+  on(window, 'pointerleave', () => { mouse.on = false; });
+  on(window, 'blur', () => { mouse.on = false; });
 
   // 移动端陀螺仪视差（iOS 需授权后才有事件，无事件则自动无效果）
-  window.addEventListener('deviceorientation', (e) => {
+  on(window, 'deviceorientation', ((e: DeviceOrientationEvent) => {
     const g = Math.max(-30, Math.min(30, e.gamma ?? 0));
     const b = Math.max(-30, Math.min(30, (e.beta ?? 0) - 40));
     parallax.tx = (-g / 30) * 10;
     parallax.ty = (b / 30) * 7;
-  });
+  }) as EventListener);
 
   // ---- 点击涟漪 ----
   const ripples: Ripple[] = [];
-  window.addEventListener('pointerdown', (e) => {
+  on(window, 'pointerdown', ((e: PointerEvent) => {
     if (!reduced) ripples.push({ x: e.clientX, y: e.clientY, life: 0, ttl: 0.75 });
-  }, { passive: true });
+  }) as EventListener, { passive: true });
 
   const mouse = { x: -9999, y: -9999, vx: 0, vy: 0, on: false };
   // 手电：平滑跟随鼠标的光斑（微型，低强度）
@@ -277,22 +292,36 @@ export function initParticles() {
     ctx!.globalCompositeOperation = 'source-over';
   }
 
+  let rafId = 0;
+  let running = true;
+
   resize();
-  window.addEventListener('resize', resize);
+  on(window, 'resize', resize);
 
   if (reduced) {
     step(0);
   } else {
-    let running = true;
-    document.addEventListener('visibilitychange', () => {
+    on(document, 'visibilitychange', () => {
       running = !document.hidden;
-      if (running) requestAnimationFrame(loop);
+      if (running) {
+        lastFrame = performance.now() / 1000; // 避免隐藏期间累积出大 dt
+        rafId = requestAnimationFrame(loop);
+      }
     });
     const loop = (now: number) => {
       if (!running) return;
       step(now / 1000);
-      requestAnimationFrame(loop);
+      rafId = requestAnimationFrame(loop);
     };
-    requestAnimationFrame(loop);
+    rafId = requestAnimationFrame(loop);
   }
+
+  teardownPrev = () => {
+    disposers.forEach((d) => d());
+    running = false;
+    cancelAnimationFrame(rafId);
+    canvas.remove();
+    document.documentElement.style.removeProperty('--bg-px');
+    document.documentElement.style.removeProperty('--bg-py');
+  };
 }

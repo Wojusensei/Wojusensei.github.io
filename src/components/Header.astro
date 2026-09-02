@@ -34,7 +34,10 @@ const nav = [
   </div>
 </header>
 <script>
-  document.getElementById('menu-toggle')?.addEventListener('click', () => {
-    document.getElementById('nav-links')?.classList.toggle('open');
+  // 挂 astro:page-load：首次加载与每次客户端导航后重新绑定（header 会被整体替换）
+  document.addEventListener('astro:page-load', () => {
+    document.getElementById('menu-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links')?.classList.toggle('open');
+    });
   });
 </script>
