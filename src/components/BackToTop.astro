@@ -11,7 +11,7 @@ import Icon from './Icon.astro';
     const btn = document.getElementById('back-top');
     if (!btn) return;
 
-    const THRESHOLD = 320;
+    const THRESHOLD = 40; // 滑过一小段就出现，短页面也能用
     let ticking = false;
     const update = () => {
       ticking = false;
