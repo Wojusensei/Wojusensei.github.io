@@ -3,6 +3,8 @@
 // - 抓取结果在构建阶段直接写入页面，访客端零 GitHub 请求，与限流彻底无关
 // - 抓取失败时优雅降级（返回 null/空），构建不会失败，等待下一次定时构建自动恢复
 
+import { execFileSync } from 'node:child_process';
+
 const API = 'https://api.github.com';
 const USER = 'Wojusensei';
 
@@ -15,13 +17,28 @@ function ghHeaders(): Record<string, string> {
   return h;
 }
 
+// 本机代理会替换 TLS 证书，Node 原生 fetch 不认其 CA；curl 走系统信任库，作网络层兜底
+function ghCurl<T = any>(path: string): T | null {
+  try {
+    const headerArgs = Object.entries(ghHeaders()).flatMap(([k, v]) => ['-H', `${k}: ${v}`]);
+    const out = execFileSync(
+      'curl',
+      ['-fsSL', '--max-time', '20', ...headerArgs, `${API}${path}`],
+      { maxBuffer: 20 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] },
+    );
+    return JSON.parse(out.toString('utf8')) as T;
+  } catch {
+    return null;
+  }
+}
+
 async function gh<T = any>(path: string): Promise<T | null> {
   try {
     const r = await fetch(`${API}${path}`, { headers: ghHeaders() });
-    if (!r.ok) return null;
+    if (!r.ok) return null; // 4xx/5xx 不重试 curl，直接降级
     return (await r.json()) as T;
   } catch {
-    return null;
+    return ghCurl<T>(path); // 仅网络层异常（如本机代理证书）才兜底
   }
 }
 

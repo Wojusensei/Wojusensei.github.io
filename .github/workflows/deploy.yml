@@ -21,6 +21,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Install, build, and upload site
         uses: withastro/action@v3
+        env:
+          # 构建时抓取 GitHub 数据（star / commit / PR 统计）；令牌只存在于此，不进入前端
+          GITHUB_DATA_TOKEN: ${{ secrets.GITHUB_DATA_TOKEN }}
 
   deploy:
     needs: build
