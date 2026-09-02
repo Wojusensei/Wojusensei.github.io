@@ -41,6 +41,13 @@ import { site } from '../data/site';
     return amount === 'custom' ? t().customNote : `¥${amount} · ${t().customNote}`;
   }
 
+  function closeModal() {
+    const modal = document.getElementById('donate-modal');
+    if (!modal?.classList.contains('open')) return;
+    modal.classList.remove('open');
+    document.querySelectorAll<HTMLButtonElement>('[data-donate-open]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+  }
+
   document.addEventListener('click', (e) => {
     const el = e.target as HTMLElement;
     const modal = document.getElementById('donate-modal');
@@ -53,8 +60,7 @@ import { site } from '../data/site';
       return;
     }
     if (el.closest('[data-donate-close]') || el.id === 'donate-modal') {
-      modal.classList.remove('open');
-      document.querySelectorAll<HTMLButtonElement>('[data-donate-open]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+      closeModal();
       return;
     }
 
@@ -76,7 +82,7 @@ import { site } from '../data/site';
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') document.getElementById('donate-modal')?.classList.remove('open');
+    if (e.key === 'Escape') closeModal();
   });
 
   // 预载两张收款码：此前支付宝码在首次点击时才开始下载解码，切换会卡一下；
