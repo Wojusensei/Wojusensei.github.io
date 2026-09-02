@@ -78,6 +78,23 @@ export function initParticles() {
     s.fillRect(0, 0, 48, 48);
   }
 
+  // 预渲染流星尾迹条纹（头亮尾透的水平渐变），每帧只做旋转+拉伸贴图，
+  // 替代原先每流星每帧的 createLinearGradient（对象分配 + 光栅化开销）
+  const STRIP_LEN = 260; // ≥ 流星最大尾长（100~250）
+  const meteorStrip = document.createElement('canvas');
+  meteorStrip.width = STRIP_LEN;
+  meteorStrip.height = 2;
+  {
+    const s = meteorStrip.getContext('2d')!;
+    const g = s.createLinearGradient(0, 0, STRIP_LEN, 0);
+    // 透明度系数与旧实现一致（0.38/0.92 烘进色值），绘制时 globalAlpha 只乘生命周期透明度
+    g.addColorStop(0, 'rgba(190, 210, 255, 0)');
+    g.addColorStop(0.75, 'rgba(205, 224, 255, 0.38)');
+    g.addColorStop(1, 'rgba(240, 246, 255, 0.92)');
+    s.fillStyle = g;
+    s.fillRect(0, 0, STRIP_LEN, 2);
+  }
+
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, dprCap);
     W = window.innerWidth;
@@ -230,17 +247,12 @@ export function initParticles() {
       const sp = Math.hypot(m.vx, m.vy) || 1;
       const tx = m.x - (m.vx / sp) * m.len;
       const ty = m.y - (m.vy / sp) * m.len;
-      const grad = ctx!.createLinearGradient(tx, ty, m.x, m.y);
-      grad.addColorStop(0, 'rgba(190, 210, 255, 0)');
-      grad.addColorStop(0.75, `rgba(205, 224, 255, ${0.38 * alpha})`);
-      grad.addColorStop(1, `rgba(240, 246, 255, ${0.92 * alpha})`);
-      ctx!.strokeStyle = grad;
-      ctx!.lineWidth = 1.6;
-      ctx!.lineCap = 'round';
-      ctx!.beginPath();
-      ctx!.moveTo(tx, ty);
-      ctx!.lineTo(m.x, m.y);
-      ctx!.stroke();
+      ctx!.save();
+      ctx!.translate(tx, ty);
+      ctx!.rotate(Math.atan2(m.vy, m.vx));
+      ctx!.globalAlpha = alpha;
+      ctx!.drawImage(meteorStrip, 0, -0.8, m.len, 1.6);
+      ctx!.restore();
       ctx!.globalAlpha = Math.min(1, alpha);
       ctx!.drawImage(sprite, m.x - 7, m.y - 7, 14, 14);
       ctx!.globalAlpha = 1;
