@@ -553,6 +553,7 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   line-height: 2;
 }
 .site-footer a { color: var(--text-2); }
+.visitor-line { font-size: 0.8rem; color: var(--text-3); }
 
 /* ---------- 404 ---------- */
 .nf { text-align: center; padding: 12vh 0; }

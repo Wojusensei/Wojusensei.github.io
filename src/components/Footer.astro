@@ -4,4 +4,22 @@ const year = new Date().getFullYear();
 ---
 <footer class="site-footer">
   <div>© {year} {site.name} · <span data-i18n="footer.built">由 Astro 构建 · 托管于 GitHub Pages</span></div>
+  <!-- 访客总量（不蒜子计数）：容器默认隐藏，计数加载成功才显示；服务不可用时整行保持隐藏 -->
+  <div class="visitor-line">
+    <span id="busuanzi_container_site_uv" style="display:none">
+      <span data-i18n="footer.visitors">访客总量</span> <span id="busuanzi_value_site_uv">-</span>
+    </span>
+  </div>
 </footer>
+<script>
+  // 不蒜子脚本按页加载：View Transitions 导航后 DOM 被替换，数值需要重新回填；
+  // 模块本身只执行一次，因此挂 astro:page-load 重注入脚本（访客数按 IP 去重，重复加载不虚增）
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLScriptElement>('script[data-busuanzi]').forEach((s) => s.remove());
+    const s = document.createElement('script');
+    s.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+    s.async = true;
+    s.dataset.busuanzi = '';
+    document.body.append(s);
+  });
+</script>
