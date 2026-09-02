@@ -147,6 +147,9 @@ main {
   padding: 24px;
   transition: background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
   will-change: transform;
+  /* 视口外的卡片跳过渲染（含 backdrop 折射），同屏只有几张卡时省一大半合成开销 */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 150px;
 }
 .g-card::before {
   content: '';
