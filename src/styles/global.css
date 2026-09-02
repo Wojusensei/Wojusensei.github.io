@@ -642,9 +642,36 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .plugin-list { display: flex; flex-direction: column; }
 
 /* ---------- 友链卡片 ---------- */
-.friend-card { display: flex; align-items: center; gap: 16px; color: var(--text); }
+.friend-card { display: flex; align-items: center; gap: 16px; color: var(--text); overflow: hidden; }
 .friend-card:hover { text-decoration: none; }
+/* 对方网站首页截图：50% 透明铺在玻璃上做底图蒙版，便于多友链时一眼区分 */
+.fc-shot {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%; /* 卡片是扁长条，锚点偏上保住立绘的脸部 */
+  opacity: 0.5;
+  pointer-events: none;
+}
+/* 文字侧的护读渐变（随亮暗主题走） */
+.fc-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--glass-bg) 0%, var(--glass-bg) 38%, transparent 74%);
+}
+.friend-card:hover .fc-shot { opacity: 0.62; }
+@media (prefers-reduced-motion: no-preference) {
+  .fc-shot { transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1); }
+  .friend-card:hover .fc-shot { transform: scale(1.04); }
+}
 .fc-avatar {
+  position: relative;
+  z-index: 1;
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -654,7 +681,7 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   box-shadow: inset 0 1px 1px var(--glass-rim-top);
   background: var(--code-bg);
 }
-.fc-body { min-width: 0; }
+.fc-body { position: relative; z-index: 1; min-width: 0; }
 .fc-body h3 { margin: 0 0 4px; font-size: 1.08rem; font-weight: 700; }
 .fc-body p { margin: 0; color: var(--text-2); font-size: 0.9rem; line-height: 1.6; overflow-wrap: anywhere; }
 .plugin-row {

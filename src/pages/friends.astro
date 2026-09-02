@@ -22,6 +22,8 @@ const siteInfo = {
     <div class="grid cols-2">
       {friends.map((f) => (
         <a class="g-card friend-card" href={f.url} target="_blank" rel="noopener">
+          {'shot' in f && <img class="fc-shot" src={f.shot} alt="" loading="lazy" aria-hidden="true" />}
+          <span class="fc-scrim" aria-hidden="true"></span>
           <img class="fc-avatar" src={f.avatar} alt={f.name} loading="lazy" />
           <div class="fc-body">
             <h3>{f.name}</h3>
