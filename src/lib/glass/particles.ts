@@ -28,6 +28,16 @@ const DAMPING = 0.9;
 
 let teardownPrev: (() => void) | null = null;
 
+// 设备分档：特效全保留，只调内部渲染精度（画布分辨率 / 粒子密度），弱设备降负载不降观感
+// 注意 Chrome 的 deviceMemory 上限就是 8（≥8GB 都报 8），不能用它区分中高档，桌面档以核心数为准
+function qualityTier(): 'low' | 'mid' | 'high' {
+  const mem = (navigator as { deviceMemory?: number }).deviceMemory;
+  const cores = navigator.hardwareConcurrency || 8;
+  if ((mem !== undefined && mem <= 4) || cores <= 4) return 'low';
+  if (window.matchMedia('(pointer: coarse)').matches || cores <= 6) return 'mid';
+  return 'high';
+}
+
 export function initParticles() {
   teardownPrev?.();
   teardownPrev = null;
@@ -39,6 +49,9 @@ export function initParticles() {
   if (!ctx) return;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const tier = qualityTier();
+  const dprCap = tier === 'low' ? 1.25 : tier === 'mid' ? 1.5 : 2;
+  const countScale = tier === 'low' ? 0.55 : tier === 'mid' ? 0.8 : 1;
 
   // 统一登记监听器，teardown 时一次拆干净
   const disposers: (() => void)[] = [];
@@ -66,7 +79,7 @@ export function initParticles() {
   }
 
   function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, dprCap);
     W = window.innerWidth;
     H = window.innerHeight;
     canvas.width = Math.round(W * dpr);
@@ -76,7 +89,7 @@ export function initParticles() {
   }
 
   function spawn() {
-    const n = Math.min(150, Math.round((W * H) / 16000));
+    const n = Math.round(Math.min(150, Math.round((W * H) / 16000)) * countScale);
     particles = Array.from({ length: n }, () => {
       const ax = Math.random() * W;
       const ay = Math.random() * H;
