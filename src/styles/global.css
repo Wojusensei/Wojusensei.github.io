@@ -343,7 +343,13 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   color: var(--text-2);
   font-size: clamp(0.98rem, 2vw, 1.08rem);
   line-height: 1.8;
+  margin: 0 0 10px;
+}
+.hero-pc-hint {
   margin: 0 0 30px;
+  color: var(--text-3);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
 }
 .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 .hero-cta .g-btn { height: 48px; padding: 0 26px; font-size: 1rem; }
