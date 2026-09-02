@@ -5,32 +5,31 @@ import Icon from './Icon.astro';
   <Icon name="up" />
 </button>
 <script>
-  // 往下滑过阈值出现，点击平滑回顶并消失；再次下滑重新出现
-  // 挂 astro:page-load：每次导航后按钮 DOM 被替换，需重新绑定（scrollY 归零，初始隐藏）
-  document.addEventListener('astro:page-load', () => {
-    const btn = document.getElementById('back-top');
-    if (!btn) return;
+  // 返回顶部：window 级监听只在模块加载时绑定一次（单例），
+  // 处理时再查当前按钮——跨页面导航（View Transitions）不会累积监听器
+  const THRESHOLD = 40; // 滑过一小段就出现，短页面也能用
 
-    const THRESHOLD = 40; // 滑过一小段就出现，短页面也能用
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      btn.classList.toggle('show', window.scrollY > THRESHOLD);
-    };
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(update);
-      }
-    };
+  let ticking = false;
+  function update() {
+    ticking = false;
+    document.getElementById('back-top')?.classList.toggle('show', window.scrollY > THRESHOLD);
+  }
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
 
-    btn.addEventListener('click', () => {
-      btn.classList.remove('show');
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
-    });
-
-    update();
-    window.addEventListener('scroll', onScroll, { passive: true });
+  // 点击走 document 委托，同样只绑定一次
+  document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('#back-top')) return;
+    document.getElementById('back-top')?.classList.remove('show');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
   });
+
+  // 每次导航后按当前滚动位置同步一次显隐（后退可能恢复非零滚动位置）
+  document.addEventListener('astro:page-load', update);
 </script>
