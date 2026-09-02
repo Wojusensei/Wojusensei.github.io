@@ -47,10 +47,10 @@ html, body { margin: 0; padding: 0; }
 
 /* 蔚蓝档案像素光标（指针本体来自 BA-Pointer 项目，经站长手工抠图） */
 html {
-  cursor: url('/cursors/ba-pointer.png') 5 4, auto;
+  cursor: url('/cursors/ba-pointer.png') 1 1, auto;
 }
 a, button, [role='button'], .g-btn, label, select, summary {
-  cursor: url('/cursors/ba-pointer.png') 5 4, pointer;
+  cursor: url('/cursors/ba-pointer.png') 1 1, pointer;
 }
 input:not([type='checkbox']):not([type='radio']),
 textarea,
