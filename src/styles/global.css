@@ -507,8 +507,8 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 /* 博客统计条 */
 .blog-stats { color: var(--text-3); font-size: 0.86rem; margin: -4px 0 20px; }
 
-/* 博客列表：单列通栏大卡 + 更宽的版面 */
-.wrap-wide { max-width: 1240px; }
+/* 博客列表：单列通栏大卡（版面宽度 = 1240px 砍 15%） */
+.wrap-wide { max-width: 1054px; }
 .post-list { display: flex; flex-direction: column; gap: 22px; }
 .post-item {
   display: flex;
