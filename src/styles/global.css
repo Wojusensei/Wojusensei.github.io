@@ -557,6 +557,16 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   overflow: hidden;
 }
 .post-item .go { color: var(--link); font-size: 0.9rem; margin-top: auto; }
+.post-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; }
+.tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag-pill {
+  font-size: 0.72rem;
+  padding: 2px 9px;
+  border-radius: 999px;
+  color: var(--link);
+  background: rgba(143, 176, 255, 0.12);
+  font-weight: 600;
+}
 @media (prefers-reduced-motion: no-preference) {
   .post-cover img { transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1); }
   .post-item:hover .post-cover img { transform: scale(1.05); }

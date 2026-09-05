@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { readingMinutes } from '../../lib/blog';
 
 const posts = (await getCollection('blog')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -24,11 +25,17 @@ const posts = (await getCollection('blog')).sort(
             <span class="post-body">
               <span class="meta">
                 {p.data.date.toISOString().slice(0, 10)}
-                {p.data.tags?.length ? ` · ${p.data.tags.join(' / ')}` : ''}
+                <span data-lang-zh> · 约 {readingMinutes(p.body)} 分钟阅读</span>
+                <span data-lang-en style="display:none"> · ~{readingMinutes(p.body)} min read</span>
               </span>
               <h3>{p.data.title}</h3>
               <p>{p.data.description}</p>
-              <span class="go" data-i18n="blog.readMore">继续阅读 →</span>
+              <span class="post-foot">
+                <span class="tag-row">
+                  {p.data.tags?.map((t) => <span class="tag-pill">{t}</span>)}
+                </span>
+                <span class="go" data-i18n="blog.readMore">继续阅读 →</span>
+              </span>
             </span>
           </a>
         ))}
