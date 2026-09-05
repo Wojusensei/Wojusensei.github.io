@@ -328,7 +328,7 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   padding: 30px 0;
 }
 .hero-copy .hero-greeting { margin: 0 0 10px; }
-.hero-copy .hero-name { font-size: clamp(3rem, 7vw, 5.4rem); margin: 0 0 14px; }
+.hero-copy .hero-name { font-size: clamp(3rem, 7vw, 5.4rem); margin: 0 0 8px; }
 .hero-copy .hero-tagline { margin: 0 0 14px; font-size: clamp(1.2rem, 2.8vw, 1.65rem); }
 .hero-copy .hero-intro { margin: 0 0 6px; }
 .hero-copy .hero-pc-hint { margin: 0 0 30px; }
@@ -433,6 +433,9 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   letter-spacing: -0.035em;
   line-height: 1.04;
   margin: 0;
+  /* background-clip:text 的渐变只画在元素框内：向下扩一截，
+     否则行高 1.04 时 j 等字母的下伸部会超出框外被裁成透明 */
+  padding-bottom: 0.12em;
   background: linear-gradient(120deg, #ffffff 35%, var(--accent) 70%, var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
