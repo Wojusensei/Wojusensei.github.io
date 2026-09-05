@@ -307,15 +307,95 @@ html.lens-ok .site-header .bar::before {
 html[data-theme='dark'] #theme-toggle .i-sun { opacity: 1; transform: rotate(0deg) scale(1); }
 html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-90deg) scale(0.4); }
 
-/* ---------- Hero ---------- */
-.hero {
+/* ---------- Hero 主视觉（星空直出大排版 + 右侧玻璃立牌） ---------- */
+.hero-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 36px;
+  min-height: calc(78dvh - var(--nav-h));
+  padding: 76px 0 40px;
+}
+.hero-copy {
+  flex: 1 1 auto;
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  min-height: calc(86dvh - var(--nav-h));
-  padding: 40px 0 24px;
+  padding: 30px 0;
+}
+.hero-copy .hero-greeting { margin: 0 0 10px; }
+.hero-copy .hero-name { font-size: clamp(3rem, 7vw, 5.4rem); margin: 0 0 14px; }
+.hero-copy .hero-tagline { margin: 0 0 14px; font-size: clamp(1.2rem, 2.8vw, 1.65rem); }
+.hero-copy .hero-intro { margin: 0 0 6px; }
+.hero-copy .hero-pc-hint { margin: 0 0 30px; }
+.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.hero-cta .g-btn { height: 48px; padding: 0 26px; font-size: 1rem; }
+
+/* 立牌：圆形头像章 + 底部落影，像悬浮在星空上的徽章（无玻璃圈，图 90% 不透明融入星空） */
+.hero-standee {
+  position: relative;
+  isolation: isolate;
+  flex: none;
+  /* 跟随版面宽度自适应（hero 容器上限 1080px），而非视口——窗口缩放时与文字同步变化 */
+  width: 36%;
+  min-width: 280px;
+  max-width: 430px;
+  border-radius: 50%;
+  transform: translateY(0);
+}
+.hero-standee img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: center 20%;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+/* 落座光晕：把圆章「安」在星空上 */
+.hero-standee::before {
+  content: '';
+  position: absolute;
+  inset: -36px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(143, 176, 255, 0.16), transparent 72%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+/* 底部投影：椭圆软影垫在圆章下沿 */
+.hero-standee::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -30px;
+  width: 72%;
+  height: 34px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, rgba(2, 6, 18, 0.55), transparent 68%);
+  filter: blur(7px);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-standee { transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1); }
+  .hero-standee::after { transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1); }
+  .hero-standee:hover { transform: translateY(-8px); }
+  .hero-standee:hover::after { opacity: 0.7; transform: translateX(-50%) scale(0.92); }
+}
+/* 窄屏：立牌直接收起（按站长要求：立牌只存在于并排布局，不挪到文字下方） */
+@media (max-width: 1020px) {
+  .hero-main { min-height: 0; padding: 52px 0 24px; }
+  .hero-standee { display: none; }
+  .hero-copy { padding: 12px 0 6px; }
+  .hero-copy .hero-name { font-size: clamp(2.6rem, 11.5vw, 3.4rem); }
+}
+@media (max-width: 760px) {
+  .hero-main { min-height: 0; padding: 44px 0 18px; }
+  .hero-copy { padding: 12px 0 6px; }
+  .hero-copy .hero-name { font-size: clamp(2.6rem, 11.5vw, 3.4rem); }
 }
 .hero-greeting {
   color: var(--text-2);
@@ -354,7 +434,6 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   font-size: 0.82rem;
   letter-spacing: 0.02em;
 }
-.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 .hero-cta .g-btn { height: 48px; padding: 0 26px; font-size: 1rem; }
 
 /* ---------- 卡片网格 ---------- */

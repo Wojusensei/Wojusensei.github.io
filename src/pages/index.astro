@@ -1,18 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
 
-// 首页保持极简：Hero + 两个入口。作品 / 博客 / 打赏分别在各自页面。
+// 首页主视觉：星空直出的大排版文字 + 右侧玻璃立牌（绿调恋恋，同站长头像图）。
+// 作品 / 博客 / 打赏分别在各自页面。
 ---
 <Base active="home">
-  <section class="hero wrap">
-    <p class="hero-greeting" data-i18n="hero.greeting">HI THERE！I'M</p>
-    <h1 class="hero-name">Wojusensei</h1>
-    <p class="hero-tagline" data-i18n="hero.tagline">忠实的蔚蓝档案玩家ᕕ(◠ڼ◠)ᕗ</p>
-    <p class="hero-intro" data-i18n="hero.intro">喜好后端开发、同人游戏制作</p>
-    <p class="hero-pc-hint" data-i18n="hero.pcHint">推荐使用PC端访问，页面呈现效果更佳</p>
-    <div class="hero-cta">
-      <a class="g-btn primary" href="/works/" data-i18n="hero.ctaWorks">看看作品</a>
-      <a class="g-btn" href="/about/" data-i18n="hero.ctaContact">联系我</a>
+  <section class="hero-main wrap">
+    <div class="hero-copy">
+      <p class="hero-greeting" data-i18n="hero.greeting">HI THERE！I'M</p>
+      <h1 class="hero-name">Wojusensei</h1>
+      <p class="hero-tagline" data-i18n="hero.tagline">忠实的蔚蓝档案玩家ᕕ(◠ڼ◠)ᕗ</p>
+      <p class="hero-intro" data-i18n="hero.intro">喜好后端开发、同人游戏制作</p>
+      <p class="hero-pc-hint" data-i18n="hero.pcHint">推荐使用PC端访问，页面呈现效果更佳</p>
+      <div class="hero-cta">
+        <a class="g-btn primary" href="/works/" data-i18n="hero.ctaWorks">看看作品</a>
+        <a class="g-btn" href="/about/" data-i18n="hero.ctaContact">联系我</a>
+      </div>
+    </div>
+    <div class="hero-standee" aria-hidden="true">
+        <img src="/images/hero-koishi-2.webp" alt="" loading="eager" />
     </div>
   </section>
 </Base>
