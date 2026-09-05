@@ -716,6 +716,43 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 @media (max-width: 880px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+/* PR 环形图大卡：全端通用（窄屏 span 2 占满一行） */
+.stat-pr-wide {
+  display: flex;
+  grid-column: span 2;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  padding: 22px 30px;
+}
+@media (min-width: 881px) {
+  .stat-pr-wide { grid-row: span 2; }
+}
+@media (max-width: 480px) {
+  .stat-pr-wide { gap: 18px; padding: 18px; }
+  .pr-ring { width: 138px; height: 138px; }
+  .pr-ring-center .stat-num { font-size: 1.5rem; }
+  .pr-ring-center .stat-label { font-size: 0.7rem; }
+  .pr-stat .stat-num { font-size: 1.25rem; }
+  .pr-stat .stat-label { font-size: 0.74rem; }
+}
+.pr-ring { position: relative; width: 172px; height: 172px; flex: none; }
+.pr-ring svg { width: 100%; height: 100%; display: block; }
+.pr-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.pr-ring-center .stat-num { font-size: 1.9rem; }
+.pr-ring-center .stat-label { font-size: 0.78rem; color: var(--text-2); }
+.pr-stats { display: flex; flex-direction: column; gap: 18px; }
+.pr-stat { display: flex; flex-direction: column; gap: 2px; }
+.pr-stat .stat-num { font-size: 1.55rem; }
+.pr-stat .stat-label { font-size: 0.82rem; color: var(--text-2); }
 .stat-tile {
   display: flex;
   flex-direction: column;

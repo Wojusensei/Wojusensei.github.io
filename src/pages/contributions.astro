@@ -14,6 +14,14 @@ const rate =
   stats.prs !== null && stats.mergedPrs !== null
     ? Math.round((stats.mergedPrs / stats.prs) * 100) + '%'
     : '–';
+// PR 环形图用：合并率数值（null = 数据缺失，环只画轨道）
+const rateNum =
+  stats.prs !== null && stats.mergedPrs !== null && stats.prs > 0
+    ? Math.min(100, Math.round((stats.mergedPrs / stats.prs) * 100))
+    : null;
+const PR_R = 50;
+const PR_CIRC = 2 * Math.PI * PR_R;
+const prArc = rateNum === null ? `0 ${PR_CIRC}` : `${(rateNum / 100) * PR_CIRC} ${PR_CIRC}`;
 
 // 语言饼图：取前 6 项，其余归入「其他」
 const COLORS = ['#8fb0ff', '#b48cff', '#5fd4c4', '#f2cd60', '#ff9e9e', '#7fd1ff', '#9aa7bf'];
@@ -67,9 +75,35 @@ const repos = contributions.repos.map((r) => ({
     <div class="stats-grid">
       <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.starsEarned)}</span><span class="stat-label" data-i18n="contrib.starsEarned">总 Star 获得数</span></div>
       <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.commits)}</span><span class="stat-label" data-i18n="contrib.commits">总 Commit 数</span></div>
-      <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.prs)}</span><span class="stat-label" data-i18n="contrib.prs">总 PR 数</span></div>
-      <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.mergedPrs)}</span><span class="stat-label" data-i18n="contrib.mergedPrs">被 Merge 的 PR 数</span></div>
-      <div class="g-card stat-tile"><span class="stat-num">{rate}</span><span class="stat-label" data-i18n="contrib.mergeRate">PR 合并概率</span></div>
+      <!-- 电脑端：PR 三项合并成 2×2 大卡 + 环形图 -->
+      <div class="g-card stat-pr-wide">
+        <div class="pr-ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <defs>
+              <linearGradient id="pr-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#8fb0ff" />
+                <stop offset="1" stop-color="#b48cff" />
+              </linearGradient>
+            </defs>
+            <circle cx="60" cy="60" r={String(PR_R)} fill="none" stroke="rgba(127,127,140,0.18)" stroke-width="12" />
+            <circle
+              cx="60" cy="60" r={String(PR_R)}
+              fill="none" stroke="url(#pr-grad)" stroke-width="12" stroke-linecap="round"
+              stroke-dasharray={prArc}
+              transform="rotate(-90 60 60)"
+            />
+          </svg>
+          <div class="pr-ring-center">
+            <span class="stat-num">{rate}</span>
+            <span class="stat-label" data-i18n="contrib.mergeRate">PR 合并概率</span>
+          </div>
+        </div>
+        <div class="pr-stats">
+          <div class="pr-stat"><span class="stat-num">{fmt(stats.prs)}</span><span class="stat-label" data-i18n="contrib.prs">总 PR 数</span></div>
+          <div class="pr-stat"><span class="stat-num">{fmt(stats.mergedPrs)}</span><span class="stat-label" data-i18n="contrib.mergedPrs">被 Merge 的 PR 数</span></div>
+          <div class="pr-stat"><span class="stat-num">{rate}</span><span class="stat-label" data-i18n="contrib.mergeRate">PR 合并概率</span></div>
+        </div>
+      </div>
       <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.issues)}</span><span class="stat-label" data-i18n="contrib.issues">提起的总 Issue 数</span></div>
       <div class="g-card stat-tile"><span class="stat-num">{fmt(stats.reviews)}</span><span class="stat-label" data-i18n="contrib.reviews">代码审查次数</span></div>
     </div>
