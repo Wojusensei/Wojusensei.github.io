@@ -404,10 +404,8 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   pointer-events: none;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .hero-standee { transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1); }
+  /* 与鼠标的互动由 heroAvatar.ts 连续插值驱动（写内联 transform），CSS 不再做 hover 跳变 */
   .hero-standee::after { transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1); }
-  .hero-standee:hover { transform: translateY(-8px); }
-  .hero-standee:hover::after { opacity: 0.7; transform: translateX(-50%) scale(0.92); }
 }
 /* 窄屏：立牌直接收起（按站长要求：立牌只存在于并排布局，不挪到文字下方） */
 @media (max-width: 1020px) {
