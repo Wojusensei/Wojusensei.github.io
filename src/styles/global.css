@@ -504,11 +504,72 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .work-card .go { color: var(--link); font-size: 0.88rem; font-weight: 600; }
 
 /* ---------- 博客 ---------- */
-.post-item { display: flex; flex-direction: column; gap: 8px; color: var(--text); }
+/* 博客封面卡：封面左、内容右（参考友情站布局）；手机端封面变顶部横幅 */
+.post-item {
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+  gap: 0;
+  color: var(--text);
+}
 .post-item:hover { text-decoration: none; }
-.post-item h3 { margin: 0; font-size: 1.2rem; font-weight: 700; }
-.post-item .meta { color: var(--text-3); font-size: 0.86rem; }
-.post-item p { margin: 0; color: var(--text-2); font-size: 0.94rem; line-height: 1.7; }
+.post-cover {
+  position: relative;
+  flex: 0 0 38%;
+  min-height: 190px;
+  overflow: hidden;
+}
+.post-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.post-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, var(--glass-bg) 0%, transparent 30%);
+  pointer-events: none;
+}
+.post-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 26px;
+}
+.post-item:hover { text-decoration: none; }
+.post-item h3 { margin: 0; font-size: 1.32rem; font-weight: 800; letter-spacing: -0.01em; }
+.post-item .meta { color: var(--text-3); font-size: 0.84rem; }
+.post-item p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.94rem;
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.post-item .go { color: var(--link); font-size: 0.9rem; margin-top: auto; }
+@media (prefers-reduced-motion: no-preference) {
+  .post-cover img { transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1); }
+  .post-item:hover .post-cover img { transform: scale(1.05); }
+  .post-item .go { transition: transform 0.3s ease; }
+  .post-item:hover .go { transform: translateX(3px); }
+}
+@media (max-width: 880px) {
+  .post-item { flex-direction: column; } /* 封面在顶部（DOM 中封面在前） */
+  .post-cover { flex: none; min-height: 0; height: 170px; }
+  .post-cover::before { background: linear-gradient(180deg, transparent 55%, var(--glass-bg) 100%); }
+  .post-body { padding: 18px 20px 22px; }
+  .post-item h3 { font-size: 1.18rem; }
+}
 
 .prose { font-size: 1.02rem; line-height: 1.85; color: var(--text); }
 .prose h1, .prose h2, .prose h3 { letter-spacing: -0.02em; line-height: 1.35; }

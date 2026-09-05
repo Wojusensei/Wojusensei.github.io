@@ -18,13 +18,18 @@ const posts = (await getCollection('blog')).sort(
       <div class="grid cols-2">
         {posts.map((p) => (
           <a class="g-card post-item" href={`/blog/${p.id}/`}>
-            <span class="meta">
-              {p.data.date.toISOString().slice(0, 10)}
-              {p.data.tags?.length ? ` · ${p.data.tags.join(' / ')}` : ''}
+            <span class="post-cover" aria-hidden="true">
+              <img src={p.data.cover ?? '/images/cover-default.webp'} alt="" loading="lazy" />
             </span>
-            <h3>{p.data.title}</h3>
-            <p>{p.data.description}</p>
-            <span class="go" data-i18n="blog.readMore">继续阅读 →</span>
+            <span class="post-body">
+              <span class="meta">
+                {p.data.date.toISOString().slice(0, 10)}
+                {p.data.tags?.length ? ` · ${p.data.tags.join(' / ')}` : ''}
+              </span>
+              <h3>{p.data.title}</h3>
+              <p>{p.data.description}</p>
+              <span class="go" data-i18n="blog.readMore">继续阅读 →</span>
+            </span>
           </a>
         ))}
       </div>
