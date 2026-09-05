@@ -123,6 +123,8 @@ const repos = contributions.repos.map((r) => ({
     <div class="g-card pie-card" style="margin-top:18px">
       {pieSlices.length > 0 && (
         <svg class="pie-donut" viewBox="0 0 200 200" aria-hidden="true">
+          <!-- 轨道垫底：填满小切片之间的亚像素缝隙，避免背景透出形成暗色缺口 -->
+          <circle cx="100" cy="100" r={String(R)} fill="none" stroke="rgba(124, 134, 153, 0.45)" stroke-width="30" />
           {pieSlices.map((d) => (
             <circle
               cx="100" cy="100" r={String(R)}
