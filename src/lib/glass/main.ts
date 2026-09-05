@@ -19,3 +19,11 @@ function start() {
 }
 
 document.addEventListener('astro:page-load', start);
+
+// Service Worker：仅生产构建注册，为大陆访客提供 github.io 被间歇阻断时的离线兜底
+// （dev 模式不注册，避免干扰实时预览；注册失败静默忽略，站点行为不变）
+if ('serviceWorker' in navigator && !import.meta.env.DEV) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
