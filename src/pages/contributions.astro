@@ -207,3 +207,65 @@ const repos = contributions.repos.map((r) => ({
     </div>
   </section>
 </Base>
+<script>
+  // 数据动画：统计数字滚动到位 + PR 合并率环形图描边生长
+  // 进入视口才触发；prefers-reduced-motion 直接显示最终值
+  let io: IntersectionObserver | null = null;
+
+  function animateStats() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // 数字滚动：.stat-num 里形如 488 / 81% 的内容从 0 数到目标值
+    document.querySelectorAll<HTMLElement>('.stat-num').forEach((el) => {
+      if (el.dataset.counted) return;
+      const final = el.textContent?.trim() ?? '';
+      const m = final.match(/^(\d+)(%)?$/);
+      if (!m) return; // 「–」等占位不参与
+      el.dataset.counted = '1';
+      const target = parseInt(m[1], 10);
+      const suffix = m[2] ?? '';
+      const t0 = performance.now();
+      const dur = 950;
+      const tick = (t: number) => {
+        const k = Math.min(1, (t - t0) / dur);
+        const eased = 1 - Math.pow(1 - k, 3);
+        el.textContent = String(Math.round(target * eased)) + suffix;
+        if (k < 1) requestAnimationFrame(tick);
+        else el.textContent = final;
+      };
+      requestAnimationFrame(tick);
+    });
+
+    // 环形图描边：dashoffset 从 arcLen → 0，弧线顺时针生长
+    const arc = document.querySelector<SVGCircleElement>('.stat-pr-wide circle[stroke-dasharray]');
+    if (arc && !arc.dataset.drawn) {
+      arc.dataset.drawn = '1';
+      const visible = Number(arc.getAttribute('stroke-dasharray')!.split(' ')[0]);
+      arc.style.transition = 'none';
+      arc.style.strokeDashoffset = String(visible);
+      requestAnimationFrame(() => {
+        arc.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(0.22, 0.61, 0.36, 1)';
+        arc.style.strokeDashoffset = '0';
+      });
+    }
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    io?.disconnect();
+    io = null;
+    const grid = document.querySelector('.stats-grid');
+    if (!grid) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io?.disconnect();
+          io = null;
+          animateStats();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(grid);
+  });
+</script>
