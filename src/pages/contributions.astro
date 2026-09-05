@@ -23,27 +23,39 @@ const PR_R = 50;
 const PR_CIRC = 2 * Math.PI * PR_R;
 const prArc = rateNum === null ? `0 ${PR_CIRC}` : `${(rateNum / 100) * PR_CIRC} ${PR_CIRC}`;
 
-// 语言饼图：取前 6 项，其余归入「其他」
-const COLORS = ['#8fb0ff', '#b48cff', '#5fd4c4', '#f2cd60', '#ff9e9e', '#7fd1ff', '#9aa7bf'];
+// 语言饼图：逐项纳入语言，直到剩余「其他」低于 1%（站长要求），其余进「其他」
+const COLORS = [
+  '#8fb0ff', '#b48cff', '#5fd4c4', '#f2cd60', '#ff9e9e', '#7fd1ff', '#9aa7bf',
+  '#c9a3ff', '#7fd1a0', '#ffb87f', '#e0a3c4', '#a3b8ff', '#8fd1e8', '#d1c07f',
+];
+const OTHERS_COLOR = '#6f7a90';
 const R = 70;
 const CIRC = 2 * Math.PI * R;
-const top = stats.languages.slice(0, 6);
-const rest = stats.languages.slice(6);
 const pieSlices = (() => {
-  const data = rest.length
-    ? [...top, { name: '__others__', bytes: rest.reduce((s, d) => s + d.bytes, 0) }]
-    : top;
-  const total = data.reduce((s, d) => s + d.bytes, 0) || 1;
+  const langs = [...stats.languages].sort((a, b) => b.bytes - a.bytes);
+  const total = langs.reduce((s, d) => s + d.bytes, 0) || 1;
+  // 依次纳入，直至剩余字节占比 < 1%
+  let acc = 0;
+  let n = 0;
+  for (let i = 0; i < langs.length; i++) {
+    acc += langs[i].bytes;
+    n = i + 1;
+    if ((total - acc) / total < 0.01) break;
+  }
+  const shown = langs.slice(0, n);
+  const restBytes = total - acc;
+  const data = restBytes > 0 ? [...shown, { name: '__others__', bytes: restBytes }] : shown;
   let offset = 0;
   return data.map((d, i) => {
     const len = (d.bytes / total) * CIRC;
+    const isOthers = d.name === '__others__';
     const seg = {
-      color: COLORS[i % COLORS.length],
+      color: isOthers ? OTHERS_COLOR : COLORS[i % COLORS.length],
       len,
       offset,
       pct: ((d.bytes / total) * 100).toFixed(1),
       name: d.name,
-      others: d.name === '__others__',
+      others: isOthers,
     };
     offset += len;
     return seg;
@@ -122,7 +134,7 @@ const repos = contributions.repos.map((r) => ({
           ))}
         </svg>
       )}
-      <div class="pie-legend">
+      <div class="pie-legend" style={`--legend-rows:${Math.ceil(pieSlices.length / 2)}`}>
         {pieSlices.map((d) => (
           <div class="pl-row">
             <span class="pl-dot" style={`background:${d.color}`}></span>

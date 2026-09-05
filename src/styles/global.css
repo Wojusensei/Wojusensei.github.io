@@ -766,7 +766,19 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .stat-label { font-size: 0.86rem; color: var(--text-2); font-weight: 600; }
 .pie-card { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; padding: 26px 30px; }
 .pie-donut { width: 180px; height: 180px; flex: none; }
-.pie-legend { display: flex; flex-direction: column; gap: 9px; flex: none; min-width: 200px; }
+/* 语言较多，图例两列网格；按列优先排（左列 = 权重前几名，右列接续），窄屏单列 */
+.pie-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(var(--legend-rows, 6), auto);
+  grid-auto-flow: column;
+  gap: 8px 26px;
+  flex: none;
+  align-content: center;
+}
+@media (max-width: 640px) {
+  .pie-legend { grid-template-columns: 1fr; grid-template-rows: none; grid-auto-flow: row; }
+}
 .pl-row { display: flex; align-items: center; gap: 10px; font-size: 0.92rem; }
 .pl-dot { width: 12px; height: 12px; border-radius: 4px; flex: none; }
 .pl-name { color: var(--text-2); flex: 1; }
