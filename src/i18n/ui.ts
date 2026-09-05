@@ -68,6 +68,8 @@ export const dict = {
     readTime: '分钟阅读',
     readTimePrefix: '约',
     back: '← 返回列表',
+    older: '← 上一篇',
+    newer: '下一篇 →',
     empty: '还没有文章，第一篇正在路上。',
   },
   about: {
@@ -177,6 +179,8 @@ export const dict = {
       readTime: 'min read',
       readTimePrefix: '~',
       back: '← Back to list',
+      older: '← Older post',
+      newer: 'Newer post →',
       empty: 'No posts yet — the first one is on its way.',
     },
     about: {

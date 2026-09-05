@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import { readingMinutes } from '../../lib/blog';
+import { site } from '../../data/site';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -11,8 +12,17 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const minutes = readingMinutes(post.body);
+
+// 上一篇 / 下一篇（列表按日期倒序：idx-1 更新，idx+1 更早）
+const sorted = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const idx = sorted.findIndex((p) => p.id === post.id);
+const newer = sorted[idx - 1];
+const older = sorted[idx + 1];
+const coverAbs = (post.data.cover ?? '/images/cover-default.webp');
 ---
-<Base active="blog" title={post.data.title} desc={post.data.description}>
+<Base active="blog" title={post.data.title} desc={post.data.description} ogImage={site.url + coverAbs}>
   <article class="section wrap" style="margin-top:24px;max-width:820px">
     <a href="/blog/" data-i18n="blog.back">← 返回列表</a>
     <div class="post-cover-hero" aria-hidden="true">
@@ -32,5 +42,21 @@ const minutes = readingMinutes(post.body);
         <Content />
       </div>
     </div>
+    {(newer || older) && (
+      <nav class="post-adj">
+        {older ? (
+          <a class="g-card adj-card" href={`/blog/${older.id}/`}>
+            <span class="adj-label" data-i18n="blog.older">← 上一篇</span>
+            <span class="adj-title">{older.data.title}</span>
+          </a>
+        ) : <span class="adj-card ghost" aria-hidden="true"></span>}
+        {newer ? (
+          <a class="g-card adj-card next" href={`/blog/${newer.id}/`}>
+            <span class="adj-label" data-i18n="blog.newer">下一篇 →</span>
+            <span class="adj-title">{newer.data.title}</span>
+          </a>
+        ) : <span class="adj-card ghost" aria-hidden="true"></span>}
+      </nav>
+    )}
   </article>
 </Base>

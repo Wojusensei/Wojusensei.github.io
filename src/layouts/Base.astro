@@ -7,8 +7,8 @@ import DonateModal from '../components/DonateModal.astro';
 import BackToTop from '../components/BackToTop.astro';
 import { site } from '../data/site';
 
-interface Props { title?: string; desc?: string; active?: string; }
-const { title, desc = `${site.name} 的个人空间：作品、博客与联系方式`, active = '' } = Astro.props;
+interface Props { title?: string; desc?: string; active?: string; ogImage?: string; }
+const { title, desc = `${site.name} 的个人空间：作品、博客与联系方式`, active = '', ogImage } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.name;
 ---
 <!doctype html>
@@ -27,6 +27,7 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     <meta property="og:site_name" content={site.name} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={site.url} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
     <script is:inline>
       // 防主题闪烁：渲染前定下亮暗；客户端导航后 html 属性会被新页面重置，需再应用一次
       (function () {
