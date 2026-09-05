@@ -571,6 +571,17 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   .post-item h3 { font-size: 1.18rem; }
 }
 
+/* 详情页封面横幅 */
+.post-cover-hero {
+  margin: 18px 0 4px;
+  height: clamp(180px, 34vw, 320px);
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+.post-cover-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
 .prose { font-size: 1.02rem; line-height: 1.85; color: var(--text); }
 .prose h1, .prose h2, .prose h3 { letter-spacing: -0.02em; line-height: 1.35; }
 .prose h2 { margin-top: 2.2em; font-size: 1.5rem; }
