@@ -1,8 +1,10 @@
-// 滚动渐入：卡片/区块进入视口时淡入 + 上浮 + 去模糊，同批元素错峰入场
-// 设计要点：
-//   - 隐藏态由 JS 添加类实现（JS 挂了页面照常可见）
-//   - 位移用独立 translate 属性，不碰 transform——与 tilt 的内联 transform 互不干扰
-//   - 每次页面导航（astro:page-load）重建观察器，旧观察器先断开
+// 页面入场编排：加载时全部目标元素按 DOM 顺序错峰淡入上浮
+// 设计取舍（站长反馈驱动）：
+//   - 不用 IntersectionObserver/滚动触发——观察器任何一环出错都会让内容永久卡在隐藏态，
+//     且「滚动到才弹出」容易被访客当成 bug
+//   - 纯时间驱动：动画必然播完，下方内容在屏外就完成入场，滚到时永远已就位
+//   - 无 JS 环境不加隐藏类，内容照常显示；prefers-reduced-motion 直接跳过
+
 const SELECTOR = [
   '.g-card',
   '.section-head',
@@ -12,35 +14,23 @@ const SELECTOR = [
   '.post-adj',
 ].join(', ');
 
-let observer: IntersectionObserver | null = null;
-
 export function initReveal() {
-  observer?.disconnect();
-  observer = null;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const targets = document.querySelectorAll<HTMLElement>(SELECTOR);
+  const targets = Array.from(document.querySelectorAll<HTMLElement>(SELECTOR));
   if (!targets.length) return;
 
-  // 隐藏初态：JS 运行到这才加上，保证无 JS 环境下内容照常显示
-  targets.forEach((el) => {
+  targets.forEach((el, i) => {
     if (el.classList.contains('reveal-in')) return;
     el.classList.add('reveal-init');
+    // 错峰入场：按 DOM 顺序每个 60ms，总时长封顶 400ms
+    el.style.animationDelay = `${Math.min(i * 60, 400)}ms`;
   });
 
-  observer = new IntersectionObserver(
-    (entries) => {
-      entries
-        .filter((e) => e.isIntersecting)
-        .forEach((e, i) => {
-          const el = e.target as HTMLElement;
-          el.style.animationDelay = `${Math.min(i * 70, 420)}ms`;
-          el.classList.add('reveal-in');
-          observer?.unobserve(el);
-        });
-    },
-    // 视口下缘外扩 22%：元素在进入视口前就开始渐入，滚到时刚好完整出现（不会滚动时才弹出来）
-    { threshold: 0.05, rootMargin: '0px 0px 22% 0px' },
-  );
-  targets.forEach((el) => observer!.observe(el));
+  // 双 rAF：确保隐藏初态先被浏览器提交，再统一开始播放
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      targets.forEach((el) => el.classList.add('reveal-in'));
+    });
+  });
 }
