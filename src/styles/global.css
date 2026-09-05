@@ -592,6 +592,9 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
     right: 0;
     left: 0;
     background: var(--glass-bg-strong);
+    /* 毛玻璃：模糊透出的页面内容，避免底下文字干扰菜单阅读（仅移动端下拉面板） */
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
     border: 1px solid var(--glass-border);
     border-radius: 22px;
     padding: 10px;
