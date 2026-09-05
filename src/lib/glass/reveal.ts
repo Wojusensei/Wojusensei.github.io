@@ -39,7 +39,8 @@ export function initReveal() {
           observer?.unobserve(el);
         });
     },
-    { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
+    // 视口下缘外扩 22%：元素在进入视口前就开始渐入，滚到时刚好完整出现（不会滚动时才弹出来）
+    { threshold: 0.05, rootMargin: '0px 0px 22% 0px' },
   );
   targets.forEach((el) => observer!.observe(el));
 }
