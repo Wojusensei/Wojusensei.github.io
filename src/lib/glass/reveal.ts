@@ -34,7 +34,7 @@ export function initReveal() {
         .filter((e) => e.isIntersecting)
         .forEach((e, i) => {
           const el = e.target as HTMLElement;
-          el.style.transitionDelay = `${Math.min(i * 70, 420)}ms`;
+          el.style.animationDelay = `${Math.min(i * 70, 420)}ms`;
           el.classList.add('reveal-in');
           observer?.unobserve(el);
         });
