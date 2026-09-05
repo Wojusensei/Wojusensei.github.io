@@ -7,6 +7,7 @@ import { initCardLensFilter } from './cardFilter';
 import { initParticles } from './particles';
 import { initTilt } from './tilt';
 import { initBaFx } from './ba-fx';
+import { initReveal } from './reveal';
 import { initTheme, initLang } from '../toggles';
 
 function start() {
@@ -14,6 +15,7 @@ function start() {
   initParticles();
   initTilt();
   initBaFx();
+  initReveal();
   initTheme();
   initLang();
 }
