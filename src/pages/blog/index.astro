@@ -32,7 +32,7 @@ const latest = posts.length ? posts[0].data.date.toISOString().slice(0, 10) : ''
       <div class="post-list">
         {posts.map((p) => (
           <a class="g-card post-item" href={`/blog/${p.id}/`}>
-            <span class="post-cover" aria-hidden="true">
+            <span class="post-cover" transition:name={`post-cover-${p.id}`} aria-hidden="true">
               <img src={p.data.cover ?? '/images/cover-blog.webp'} alt="" loading="lazy" />
             </span>
             <span class="post-body">
