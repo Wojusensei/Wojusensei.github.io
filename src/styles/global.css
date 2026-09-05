@@ -504,6 +504,9 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .work-card .go { color: var(--link); font-size: 0.88rem; font-weight: 600; }
 
 /* ---------- 博客 ---------- */
+/* 博客统计条 */
+.blog-stats { color: var(--text-3); font-size: 0.86rem; margin: -4px 0 20px; }
+
 /* 博客封面卡：封面左、内容右（参考友情站布局）；手机端封面变顶部横幅 */
 .post-item {
   display: flex;

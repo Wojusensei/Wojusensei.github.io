@@ -6,6 +6,11 @@ import { readingMinutes } from '../../lib/blog';
 const posts = (await getCollection('blog')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
+
+// 统计条：篇数 / 总字数 / 最近更新
+const totalChars = posts.reduce((s, p) => s + (p.body ?? '').replace(/\s/g, '').length, 0);
+const wordsLabel = totalChars >= 1000 ? (totalChars / 1000).toFixed(1) + 'k' : String(totalChars);
+const latest = posts.length ? posts[0].data.date.toISOString().slice(0, 10) : '';
 ---
 <Base active="blog" title="博客" desc="Wojusensei 的博客：技术笔记、开发日志与随想">
   <section class="section wrap" style="margin-top:24px">
@@ -13,6 +18,14 @@ const posts = (await getCollection('blog')).sort(
       <h1 class="section-title" data-i18n="blog.title">博客</h1>
       <p class="section-desc" data-i18n="blog.subtitle">技术笔记、开发日志与随想</p>
     </div>
+    {posts.length > 0 && (
+      <p class="blog-stats">
+        <span data-lang-zh>共 {posts.length} 篇文章 · 约 {wordsLabel} 字 · 最近更新 {latest}</span>
+        <span data-lang-en style="display:none">
+          {posts.length} posts · ~{wordsLabel} characters · last update {latest}
+        </span>
+      </p>
+    )}
     {posts.length === 0 ? (
       <p class="section-desc" data-i18n="blog.empty">还没有文章，第一篇正在路上。</p>
     ) : (
