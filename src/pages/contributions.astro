@@ -47,7 +47,8 @@ const pieSlices = (() => {
   const data = restBytes > 0 ? [...shown, { name: '__others__', bytes: restBytes }] : shown;
   let offset = 0;
   return data.map((d, i) => {
-    const len = (d.bytes / total) * CIRC;
+    // 微切片保底 2.5px 弧长：占比再小也在环上可见（track 垫底吸收累计偏移）
+    const len = Math.max((d.bytes / total) * CIRC, 2.5);
     const isOthers = d.name === '__others__';
     const seg = {
       color: isOthers ? OTHERS_COLOR : COLORS[i % COLORS.length],
