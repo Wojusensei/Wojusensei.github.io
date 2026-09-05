@@ -356,6 +356,30 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   border-radius: 50%;
   opacity: 0.9;
 }
+/* 头像周围的旋转渐变圆环：蓝白 → 蓝 → 淡紫循环流动（与头像留有小间隙） */
+.hs-ring {
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #eef3ff 0deg,
+    #8fb0ff 70deg,
+    #6f8cff 135deg,
+    #b9a3ff 200deg,
+    #d5c6ff 255deg,
+    #8fb0ff 320deg,
+    #eef3ff 360deg
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 7px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 7px));
+  filter: drop-shadow(0 0 9px rgba(143, 176, 255, 0.5));
+  animation: hs-spin 8s linear infinite;
+  pointer-events: none;
+}
+@keyframes hs-spin {
+  to { transform: rotate(360deg); }
+}
 /* 落座光晕：把圆章「安」在星空上 */
 .hero-standee::before {
   content: '';
