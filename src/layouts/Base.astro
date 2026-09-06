@@ -28,6 +28,7 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     <meta property="og:type" content="website" />
     <meta property="og:url" content={site.url} />
     {ogImage && <meta property="og:image" content={ogImage} />}
+    <link rel="alternate" type="application/rss+xml" title="Wojusensei 的博客" href="/rss.xml" />
     <script is:inline>
       // 防主题闪烁：渲染前定下亮暗；客户端导航后 html 属性会被新页面重置，需再应用一次
       (function () {
