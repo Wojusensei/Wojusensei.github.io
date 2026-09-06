@@ -14,7 +14,7 @@ tags: [随笔,开发]
 
 ## 由来？
 
-在一开始，我其实在处理另一份 issue 。那份议题提出的问题是：XML plist 文件里的 <key> 标签出现在 <dict> 容器外部时，解析器没有给出有意义的错误提示，而是直接抛出一个让用户摸不着头脑的 IndexError 。这是怎么回事呢？
+在一开始，我其实在处理另一份 issue 。那份议题提出的问题是：XML plist 文件里的 key 标签出现在 dict 容器外部时，解析器没有给出有意义的错误提示，而是直接抛出一个让用户摸不着头脑的 IndexError 。这是怎么回事呢？
 
 拿一段不合法的 plist 文件来举例：
 
@@ -25,7 +25,7 @@ tags: [随笔,开发]
 </plist>
 ```
 
-在这里，<key> 直接放在根部，外面没有 <dict> 包裹。解析器在执行 end_key() 方法时，self.stack 是空的，但代码没有检查这一点就直接访问了 self.stack[-1]，触发了 IndexError 。
+在这里，key 直接放在根部，外面没有 dict 包裹。解析器在执行 end_key() 方法时，self.stack 是空的，但代码没有检查这一点就直接访问了 self.stack[-1]，触发了 IndexError 。
 
 我的理解是：要解决这个问题的最优方案是在 Lib/plistlib.py 的 _PlistParser 类中，给 end_key() 方法加一个空栈检查——这样之后，遇到不合法的 plist 文件会抛出带行号的 InvalidFileException，而不是让用户看到莫名其妙的 IndexError 。对此我做了如下修改：
 ```python
