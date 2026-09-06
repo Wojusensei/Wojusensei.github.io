@@ -1062,3 +1062,19 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
     filter: blur(0);
   }
 }
+
+/* 跳到正文（键盘可达性）：平时不可见，Tab 聚焦时浮现 */
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  transform: translateY(-64px);
+  transition: transform 0.2s ease;
+}
+.skip-link:focus-visible { transform: translateY(0); }

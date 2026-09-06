@@ -49,8 +49,9 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#main" data-i18n="misc.skip">跳到正文</a>
     <Header active={active} />
-    <main>
+    <main id="main">
       <slot />
     </main>
     <Footer />

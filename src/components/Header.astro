@@ -29,15 +29,18 @@ const nav = [
         <span class="i-sun"><Icon name="sun" /></span>
         <span class="i-moon"><Icon name="moon" /></span>
       </button>
-      <button class="g-btn icon menu-toggle" id="menu-toggle" aria-label="菜单"><Icon name="menu" /></button>
+      <button class="g-btn icon menu-toggle" id="menu-toggle" aria-label="菜单" aria-expanded="false" aria-controls="nav-links"><Icon name="menu" /></button>
     </div>
   </div>
 </header>
 <script>
   // 挂 astro:page-load：首次加载与每次客户端导航后重新绑定（header 会被整体替换）
   document.addEventListener('astro:page-load', () => {
-    document.getElementById('menu-toggle')?.addEventListener('click', () => {
-      document.getElementById('nav-links')?.classList.toggle('open');
+    const toggle = document.getElementById('menu-toggle');
+    const nav = document.getElementById('nav-links');
+    toggle?.addEventListener('click', () => {
+      nav?.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', nav?.classList.contains('open') ? 'true' : 'false');
     });
   });
 </script>
