@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "node scripts/fetch-friend-avatars.mjs && astro build && node scripts/inject-sw-manifest.mjs",
-    "preview": "astro preview",
-    "build:local": "NODE_OPTIONS=--use-system-ca astro build"
+    "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
