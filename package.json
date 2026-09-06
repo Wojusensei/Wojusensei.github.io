@@ -10,6 +10,7 @@
     "build:local": "NODE_OPTIONS=--use-system-ca astro build"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
     "astro": "^7.2.10",
     "ba-click-fx": "^1.3.1"
   }

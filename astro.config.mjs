@@ -1,8 +1,10 @@
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://wojusensei.github.io',
   trailingSlash: 'ignore',
+  integrations: [sitemap()],
   build: {
     inlineStylesheets: 'auto',
   },
