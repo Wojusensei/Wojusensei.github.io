@@ -804,6 +804,7 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .nf p { color: var(--text-2); font-size: 1.1rem; }
 .nf-sub { color: var(--text-3); font-size: 0.95rem; margin: 6px 0 0; }
 .nf-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+.nf .g-btn { height: 54px; padding: 0 38px; font-size: 1.05rem; }
 
 /* ---------- 响应式 ---------- */
 .menu-toggle { display: none; }
