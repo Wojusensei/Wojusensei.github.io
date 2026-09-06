@@ -794,13 +794,16 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .nf { text-align: center; padding: 12vh 0; }
 .nf h1 {
   font-size: clamp(3rem, 10vw, 6rem);
-  margin: 0;
+  line-height: 1.1;
+  margin: 0 0 10px;
   background: linear-gradient(120deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .nf p { color: var(--text-2); font-size: 1.1rem; }
+.nf-sub { color: var(--text-3); font-size: 0.95rem; margin: 6px 0 0; }
+.nf-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
 
 /* ---------- 响应式 ---------- */
 .menu-toggle { display: none; }

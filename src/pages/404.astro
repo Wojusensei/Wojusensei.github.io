@@ -5,6 +5,11 @@ import Base from '../layouts/Base.astro';
   <div class="nf wrap">
     <h1>404</h1>
     <p data-i18n="misc.page404">这一页掉进液态玻璃里了</p>
-    <p style="margin-top:24px"><a class="g-btn pill" href="/" data-i18n="misc.backHome">回首页</a></p>
+    <p class="nf-sub" data-lang-zh>你要找的内容不在这里，可能已被移动或从未存在。</p>
+    <p class="nf-sub" data-lang-en style="display:none">The page you are looking for has been moved or never existed.</p>
+    <p class="nf-btns">
+      <a class="g-btn primary" href="/" data-i18n="misc.backHome">回首页</a>
+      <a class="g-btn" href="/blog/" data-i18n="misc.toBlog">去逛逛博客</a>
+    </p>
   </div>
 </Base>
