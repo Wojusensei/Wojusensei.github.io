@@ -1,4 +1,5 @@
 ---
+cover: /images/uuz.webp
 title: 纯文档PR？我到底经历了什么
 description: 本文将较为详细地讲述本人在鼓起勇气向 CPython 官方解释器仓库做第一次贡献的踩坑经历
 date: 2026-09-07
