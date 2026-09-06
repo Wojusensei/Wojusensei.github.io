@@ -1,7 +1,7 @@
 ---
 cover: /images/uuz.jpg
 title: 纯文档PR？我到底做了什么
-description: 本文将较为详细地讲述本人在鼓起勇气向 CPython 官方解释器仓库做第一次贡献的踩坑经历。
+description: 本文将较为详细地讲述本人在鼓起勇气向 CPython 官方解释器仓库做第一次贡献时的踩坑经历。
 date: 2026-09-07
 tags: [随笔,开发]
 ---
@@ -42,5 +42,8 @@ def end_key(self):
 不过，实际上我认为在这个问题中 InvalidFileException 的使用要优于 ValueError ：InvalidFileException 是 plistlib 自己定义的异常，继承自 ValueError。用它的好处是调用者可以精确捕获“plist 文件格式错误”，而不需要捕获所有 ValueError。在一致性上，我提供的方案在模块内模块内的表现是其他解析错误都用 InvalidFileException ，且对于可能出现的错误信息提供了包含行号的报错，显然对于用户更加友好。当然，这些都是后话了，肯定会有更加厉害也更加热心的贡献者会提出我所想象不到的更优秀的方法来优化这个问题；于我而言，这个被关闭的拉取请求或许可以成为别人的参考，这就够了——当然我也有后悔的事情，就像那句话："It wastes the maintainer's time to close the duplicate PR ."
 
 ## 后续？
-- 正在更新中，请稍后
+毕竟贡献时间处于一个假期，我也处于游手好闲的阶段，于是在PR被拒之后，我开始在 Cpython 的 issue 列表里面闲逛。偶然间，我看到了 Issue #152798 ："sys.thread_info.lock was changed to 'pymutex' in 3.15, even though _thread.Lock had already switched to PyMutex in 3.14 and 3.13.1"。也就是说，报告者发现了两个不一致：在 Python 3.13.1 / 3.14 和 Python 3.15 中，_thread.Lock 底层实现均是已改用了 PyMutex 的；而在后者的 sys.thread_info.lock 返回值已经修改的情况下，前者的返回值仍是"semaphore"（Linux）或 None（Windows）。
 
+报告者提出这个改动滞后了—— 根据 ta 的意思，_thread.Lock 早在 3.13.1 / 3.14 就已经切到 PyMutex，但 sys.thread_info.lock 直到 3.15 才改；PyMutex 本身底层仍然依赖平台相关的同步原语（POSIX semaphore、pthread_cond + pthread_mutex、Windows CreateSemaphore），所以返回 "pymutex" 反而让它的含义变得模糊，所以建议把 sys.thread_info.lock 改回原来的值。
+
+- 更新中，请稍后...
