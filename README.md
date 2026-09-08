@@ -1,5 +1,5 @@
-- Astro + WebGL 液态玻璃渲染 + Matter.js 物理引擎。
-- 本地开发：
+- Astro + WebGL + Matter.js
+- local dev
 ```bash
 npm install
 npm run dev
