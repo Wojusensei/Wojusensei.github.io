@@ -1106,3 +1106,33 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   transition: transform 0.2s ease;
 }
 .skip-link:focus-visible { transform: translateY(0); }
+
+/* ---------- 首次进站加载幕 ---------- */
+#load-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: #05070f;
+  transition: opacity 0.45s ease;
+}
+#load-veil.veil-done { opacity: 0; pointer-events: none; }
+#load-veil .veil-name {
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+}
+#load-veil .veil-spinner {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid rgba(143, 176, 255, 0.2);
+  border-top-color: #8fb0ff;
+  animation: veil-spin 0.9s linear infinite;
+}
+@keyframes veil-spin { to { transform: rotate(360deg); } }

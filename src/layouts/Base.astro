@@ -49,6 +49,24 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     </script>
   </head>
   <body>
+    <!-- 首次进站加载幕：每会话一次（sessionStorage），客户端导航与后续刷新不出现；3.5s 兜底必消失 -->
+    <script is:inline>
+      (function () {
+        try { if (sessionStorage.getItem('woju-veil')) return; } catch (e) {}
+        try { sessionStorage.setItem('woju-veil', '1'); } catch (e) {}
+        var d = document.createElement('div');
+        d.id = 'load-veil';
+        d.innerHTML = '<span class="veil-name">Wojusensei</span><span class="veil-spinner"></span>';
+        document.body.insertBefore(d, document.body.firstChild);
+        var done = function () {
+          d.classList.add('veil-done');
+          setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 500);
+        };
+        if (document.readyState === 'complete') done();
+        else window.addEventListener('load', done);
+        setTimeout(done, 3500);
+      })();
+    </script>
     <a class="skip-link" href="#main" data-i18n="misc.skip">跳到正文</a>
     <Header active={active} />
     <main id="main">
