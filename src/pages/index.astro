@@ -1,25 +1,85 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { readingMinutes } from '../lib/blog';
+import Icon from '../components/Icon.astro';
+import { works } from '../data/works';
+import { friends } from '../data/friends';
+import { site } from '../data/site';
 
-// 首页主视觉：星空直出的大排版文字 + 右侧玻璃立牌（绿调恋恋，同站长头像图）。
-// 作品 / 博客 / 打赏分别在各自页面。
+// 首页（毛玻璃分支）：资料卡 + 最新文章卡 + 封面叠加网格（参考友站布局）
+const allPosts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const latest = allPosts.slice(0, 4);
+const statPosts = allPosts.length;
+const statWorks = works.length;
+const statFriends = friends.length;
+const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
 ---
 <Base active="home">
-  <section class="hero-main wrap">
-    <div class="hero-copy">
-      <p class="hero-greeting" data-i18n="hero.greeting">HI THERE！I'M</p>
-      <h1 class="hero-name">Wojusensei</h1>
-      <p class="hero-tagline" data-i18n="hero.tagline">忠实的蔚蓝档案玩家ᕕ(◠ڼ◠)ᕗ</p>
-      <p class="hero-intro" data-i18n="hero.intro">喜好后端开发、同人游戏制作</p>
-      <p class="hero-pc-hint" data-i18n="hero.pcHint">推荐使用PC端访问，页面呈现效果更佳</p>
-      <div class="hero-cta">
-        <a class="g-btn primary" href="/works/" data-i18n="hero.ctaWorks">看看作品</a>
-        <a class="g-btn" href="/about/" data-i18n="hero.ctaContact">联系我</a>
+  <section class="wrap home-hero">
+    <div class="g-card profile-card">
+      <div class="pc-avatar" aria-hidden="true">
+        <span class="hs-ring"></span>
+        <img src="/images/hero-koishi-2.webp" alt="" loading="eager" />
+      </div>
+      <div class="pc-info">
+        <h1 class="pc-name">Wojusensei</h1>
+        <p class="pc-bio" data-i18n="hero.tagline">忠实的蔚蓝档案玩家ᕕ(◠ڼ◠)ᕗ</p>
+        <p class="pc-bio2" data-i18n="hero.intro">喜好后端开发、同人游戏制作</p>
+        <p class="pc-hint" data-i18n="hero.pcHint">推荐使用PC端访问，页面呈现效果更佳</p>
+        <div class="pc-stats">
+          <span class="pc-stat"><b>{statPosts}</b><i data-i18n="home.statPosts">文章</i></span>
+          <span class="pc-stat"><b>{statWorks}</b><i data-i18n="home.statWorks">项目</i></span>
+          <span class="pc-stat"><b>{statFriends}</b><i data-i18n="home.statFriends">友链</i></span>
+        </div>
+        <div class="pc-social">
+          <a class="pc-icon" href={site.socials.github} target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" /></a>
+          <a class="pc-icon" href={`https://space.bilibili.com/${site.socials.bilibili.replace(/\D/g, '')}`} target="_blank" rel="noopener" aria-label="Bilibili"><Icon name="bilibili" /></a>
+          <a class="pc-icon" href={`mailto:${site.socials.email}`} aria-label="Email"><Icon name="mail" /></a>
+          <button class="pc-icon" type="button" data-copy-text={site.socials.qq} aria-label={`QQ ${site.socials.qq}`}><Icon name="qq" /></button>
+        </div>
       </div>
     </div>
-    <div class="hero-standee" aria-hidden="true">
-      <span class="hs-ring"></span>
-      <img src="/images/hero-koishi-2.webp" alt="" loading="eager" />
+
+    <aside class="g-card side-card">
+      <h3 class="side-title" data-i18n="home.latestTitle">最新文章</h3>
+      {allPosts.slice(0, 3).map((p) => (
+        <a class="side-post" href={`/blog/${p.id}/`}>
+          <span class="side-post-title">{p.data.title}</span>
+          <span class="side-post-date">{fmtDate(p.data.date)}</span>
+        </a>
+      ))}
+      <a class="side-all" href="/blog/" data-i18n="home.allPosts">全部文章 →</a>
+    </aside>
+  </section>
+
+  <section class="wrap home-posts">
+    <div class="hp-grid">
+      {latest.map((p) => (
+        <a class="g-card hpc" href={`/blog/${p.id}/`}>
+          <img class="hpc-img" src={p.data.cover ?? '/images/cover-blog.webp'} alt="" loading="lazy" />
+          <span class="hpc-scrim" aria-hidden="true"></span>
+          <span class="hpc-body">
+            <span class="hpc-badge">{p.data.tags?.[0] ?? 'POST'}</span>
+            <h3>{p.data.title}</h3>
+            <span class="hpc-meta">{fmtDate(p.data.date)} · 约 {readingMinutes(p.body)} 分钟阅读</span>
+          </span>
+        </a>
+      ))}
     </div>
   </section>
 </Base>
+<script>
+  // QQ 号复制（资料卡社交按钮）
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLElement>('[data-copy-text]').forEach((btn) => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(btn.dataset.copyText!); } catch { /* 静默 */ }
+      });
+    });
+  });
+</script>

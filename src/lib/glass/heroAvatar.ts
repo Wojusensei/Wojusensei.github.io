@@ -4,8 +4,8 @@
 // 仅响应鼠标（触摸滚动不触发）；prefers-reduced-motion 直接不启用。
 
 export function initHeroAvatar() {
-  const section = document.querySelector<HTMLElement>('.hero-main');
-  const disc = document.querySelector<HTMLElement>('.hero-standee');
+  const section = document.querySelector<HTMLElement>('.home-hero');
+  const disc = document.querySelector<HTMLElement>('.pc-avatar');
   if (!section || !disc) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 

@@ -48,6 +48,11 @@ export const dict = {
   home: {
     worksTitle: '精选作品',
     worksMore: '查看全部 →',
+    statPosts: '文章',
+    statWorks: '项目',
+    statFriends: '友链',
+    latestTitle: '最新文章',
+    allPosts: '全部文章 →',
     worksDesc: '一些我做得比较满意的 GitHub 项目',
     blogTitle: '最新文章',
     blogMore: '全部文章 →',
@@ -162,6 +167,11 @@ export const dict = {
     home: {
       worksTitle: 'Featured Works',
       worksMore: 'View all →',
+      statPosts: 'Posts',
+      statWorks: 'Projects',
+      statFriends: 'Friends',
+      latestTitle: 'Latest Posts',
+      allPosts: 'All posts →',
       worksDesc: 'GitHub projects I am proud of',
       blogTitle: 'Latest Posts',
       blogMore: 'All posts →',

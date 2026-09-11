@@ -3,19 +3,13 @@
 // 挂在 astro:page-load 上：首次加载与 View Transitions 的每次客户端导航都会触发，
 // 各 init 自己负责拆掉上一页遗留的监听器 / 动画循环（见各模块的 teardown）
 
-import { initCardLensFilter } from './cardFilter';
 import { initParticles } from './particles';
-import { initTilt } from './tilt';
-import { initBaFx } from './ba-fx';
 import { initReveal } from './reveal';
 import { initHeroAvatar } from './heroAvatar';
 import { initTheme, initLang } from '../toggles';
 
 function start() {
-  initCardLensFilter();
   initParticles();
-  initTilt();
-  initBaFx();
   initReveal();
   initHeroAvatar();
   initTheme();
