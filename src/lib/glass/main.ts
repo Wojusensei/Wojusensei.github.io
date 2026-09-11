@@ -8,6 +8,7 @@ import { initReveal } from './reveal';
 import { initHeroAvatar } from './heroAvatar';
 import { initCardLensFilter } from './cardFilter';
 import { initTilt } from './tilt';
+import { initBaFx } from './ba-fx';
 import { initTheme, initLang } from '../toggles';
 
 function start() {
@@ -23,6 +24,8 @@ function start() {
     initCardLensFilter();
     initTilt();
   }
+  // 蔚蓝档案点击 + 光标拖尾特效：两种皮肤都保留（站长要求）
+  initBaFx();
 
   // 右下角皮肤切换：写入偏好 → 加载幕 → 整页刷新应用新皮肤
   document.getElementById('skin-toggle')?.addEventListener('click', () => {
