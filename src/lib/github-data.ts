@@ -6,6 +6,7 @@
 import { execFileSync } from 'node:child_process';
 
 const API = 'https://api.github.com';
+const GRAPHQL = 'https://api.github.com/graphql';
 const USER = 'Wojusensei';
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -179,4 +180,55 @@ export async function fetchUpstreamStars(
     if (r) out[full] = r.stargazers_count ?? 0;
   }
   return out;
+}
+
+// ---------- GitHub 贡献日历（绿色格子工作日志，仅当年） ----------
+
+export interface ContribDay {
+  date: string;
+  count: number;
+}
+
+async function ghGraphQL<T = any>(query: string, variables: Record<string, unknown>): Promise<T | null> {
+  try {
+    const res = await fetch(GRAPHQL, {
+      method: 'POST',
+      headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return (json.data ?? null) as T | null;
+  } catch {
+    try {
+      const headerArgs = Object.entries(ghHeaders()).flatMap(([k, v]) => ['-H', `${k}: ${v}`]);
+      const out = execFileSync(
+        'curl',
+        [
+          '-fsSL', '--max-time', '20', '-X', 'POST',
+          ...headerArgs, '-H', 'Content-Type: application/json',
+          '-d', JSON.stringify({ query, variables }), GRAPHQL,
+        ],
+        { maxBuffer: 20 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] },
+      );
+      const json = JSON.parse(out.toString('utf8'));
+      return (json.data ?? null) as T | null;
+    } catch {
+      return null;
+    }
+  }
+}
+
+// 抓取指定年份的贡献日历（扁平为天列表）；失败返回 null，页面自动隐藏该板块
+export async function fetchContribCalendar(year: number): Promise<ContribDay[] | null> {
+  if (!(import.meta.env.GITHUB_DATA_TOKEN as string | undefined)) return null;
+  const data = await ghGraphQL<any>(
+    `query($from:DateTime!,$to:DateTime!){user(login:"${USER}"){contributionsCollection(from:$from,to:$to){contributionCalendar{weeks{contributionDays{date contributionCount}}}}}}`,
+    { from: `${year}-01-01T00:00:00Z`, to: `${year}-12-31T23:59:59Z` },
+  );
+  const weeks = data?.user?.contributionsCollection?.contributionCalendar?.weeks;
+  if (!Array.isArray(weeks)) return null;
+  return weeks.flatMap((w: any) =>
+    (w.contributionDays ?? []).map((d: any) => ({ date: d.date as string, count: d.contributionCount as number })),
+  );
 }

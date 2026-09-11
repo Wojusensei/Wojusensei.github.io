@@ -4,10 +4,32 @@
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { contributions } from '../data/contributions';
-import { fetchGhStats, fetchUpstreamStars } from '../lib/github-data';
+import { fetchGhStats, fetchUpstreamStars, fetchContribCalendar } from '../lib/github-data';
 
 const stats = await fetchGhStats();
 const upstreamStars = await fetchUpstreamStars(contributions.repos.map((r) => r.repo));
+// GitHub 工作日志：当前年份贡献日历（构建时抓取，6 小时随定时构建刷新）
+const calYear = new Date().getFullYear();
+const calendar = await fetchContribCalendar(calYear);
+const calWeeks = calendar
+  ? (() => {
+      // 按 7 天一组切成周列，并对齐到星期日开头（GitHub 日历的排布）
+      const cols: { date: string; count: number; level: number }[][] = [];
+      let col: { date: string; count: number; level: number }[] | null = null;
+      for (const d of calendar) {
+        const dow = new Date(d.date + 'T00:00:00Z').getUTCDay();
+        if (dow === 0 || !col) {
+          if (col) cols.push(col);
+          col = [];
+        }
+        const level = d.count === 0 ? 0 : d.count <= 2 ? 1 : d.count <= 5 ? 2 : d.count <= 10 ? 3 : 4;
+        col.push({ date: d.date, count: d.count, level });
+      }
+      if (col) cols.push(col);
+      return cols;
+    })()
+  : [];
+const calTotal = calendar?.reduce((s, d) => s + d.count, 0) ?? 0;
 
 const fmt = (v: number | null) => (v === null ? '–' : String(v));
 const rate =
@@ -145,6 +167,36 @@ const repos = contributions.repos.map((r) => ({
         <p class="section-desc" style="font-size:.86rem" data-i18n="contrib.pieNote">按公开仓库的代码字节统计，数据在构建时抓取，每 6 小时自动刷新。</p>
       </div>
     </div>
+
+    {calWeeks.length > 0 && (
+      <div class="g-card cal-card">
+        <div class="cal-head">
+          <h3 data-i18n="contrib.calTitle">GitHub 工作日志</h3>
+          <span class="cal-total">
+            <span data-lang-zh>{calTotal} 次贡献 · {calYear}</span>
+            <span data-lang-en style="display:none">{calTotal} contributions · {calYear}</span>
+          </span>
+        </div>
+        <div class="cal-grid">
+          {calWeeks.map((week) => (
+            week.map((d) => (
+              <span class={`cal-cell c${d.level}`} title={`${d.date} · ${d.count} 次贡献`} />
+            ))
+          ))}
+        </div>
+        <div class="cal-scale">
+          <span data-lang-zh>少</span>
+          <span data-lang-en style="display:none">Less</span>
+          <span class="cal-cell c0"></span>
+          <span class="cal-cell c1"></span>
+          <span class="cal-cell c2"></span>
+          <span class="cal-cell c3"></span>
+          <span class="cal-cell c4"></span>
+          <span data-lang-zh>多</span>
+          <span data-lang-en style="display:none">More</span>
+        </div>
+      </div>
+    )}
 
     <div class="section-head" style="margin:52px 0 14px">
       <h2 class="section-title" style="font-size:1.2rem" data-i18n="contrib.reposTitle">贡献过的高星仓库</h2>

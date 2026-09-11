@@ -18,6 +18,7 @@ export const dict = {
   contrib: {
     title: '贡献',
     reposTitle: '贡献过的高星仓库',
+    calTitle: 'GitHub 工作日志',
     statsTitle: '统计面板',
     starsEarned: '总 Star 获得数',
     commits: '总 Commit 数',
@@ -131,6 +132,7 @@ export const dict = {
     contrib: {
       title: 'Contributions',
       reposTitle: 'High-star Repositories Contributed To',
+      calTitle: 'GitHub Activity',
       statsTitle: 'Stats Panel',
       starsEarned: 'Total Stars Earned',
       commits: 'Total Commits',
