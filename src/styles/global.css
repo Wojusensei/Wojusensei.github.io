@@ -614,14 +614,38 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   border-radius: 8px;
   border: 1px solid var(--glass-border);
 }
+/* 代码块：macOS 窗口风格（标题栏 + 红黄绿三灯） */
 .prose pre {
-  background: var(--code-bg);
+  position: relative;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02)) top / 100% 40px no-repeat,
+    var(--code-bg);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
-  padding: 18px 20px;
+  padding: 52px 20px 18px;
   overflow-x: auto;
   font-size: 0.88rem;
   line-height: 1.7;
+}
+.prose pre::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f56;
+  box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+}
+.prose pre::after {
+  content: '';
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--glass-border);
 }
 .prose pre code { background: none; padding: 0; border: none; }
 .prose blockquote {
