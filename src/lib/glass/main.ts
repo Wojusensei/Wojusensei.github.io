@@ -6,6 +6,8 @@
 import { initParticles } from './particles';
 import { initReveal } from './reveal';
 import { initHeroAvatar } from './heroAvatar';
+import { initCardLensFilter } from './cardFilter';
+import { initTilt } from './tilt';
 import { initTheme, initLang } from '../toggles';
 
 function start() {
@@ -14,6 +16,23 @@ function start() {
   initHeroAvatar();
   initTheme();
   initLang();
+
+  // 双皮肤分派：液态玻璃 = 折射滤镜 + 重力倾斜；毛玻璃 = 无这两样（低开销）
+  const skin = document.documentElement.dataset.skin === 'liquid' ? 'liquid' : 'frosted';
+  if (skin === 'liquid') {
+    initCardLensFilter();
+    initTilt();
+  }
+
+  // 右下角皮肤切换：写入偏好 → 加载幕 → 整页刷新应用新皮肤
+  document.getElementById('skin-toggle')?.addEventListener('click', () => {
+    const next = skin === 'liquid' ? 'frosted' : 'liquid';
+    try {
+      localStorage.setItem('woju-skin', next);
+      sessionStorage.setItem('woju-veil-force', '1');
+    } catch { /* 存储不可用时静默，仍然刷新 */ }
+    location.reload();
+  });
 }
 
 document.addEventListener('astro:page-load', start);

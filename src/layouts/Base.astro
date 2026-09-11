@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import DonateModal from '../components/DonateModal.astro';
 import BackToTop from '../components/BackToTop.astro';
+import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
 
 interface Props { title?: string; desc?: string; active?: string; ogImage?: string; }
@@ -26,6 +27,19 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     <link rel="preload" as="image" href="/images/bg.webp" fetchpriority="high" />
     <!-- 中文正文字体：思源宋体分片自托管（unicode-range 按需加载，英文不受影响） -->
     <link rel="stylesheet" href="/fonts/noto-serif-sc.css" />
+    <!-- 双皮肤：液态玻璃皮肤层（毛玻璃为默认，脚本按存储决定启用哪层） -->
+    <link rel="stylesheet" href="/skins/liquid.css" data-skin-liquid />
+    <script is:inline>
+      (function () {
+        var skin = 'frosted';
+        try { skin = localStorage.getItem('woju-skin') || 'frosted'; } catch (e) {}
+        document.documentElement.dataset.skin = skin;
+        if (skin !== 'liquid') {
+          var l = document.querySelector('link[data-skin-liquid]');
+          if (l) l.disabled = true;
+        }
+      })();
+    </script>
     <ClientRouter />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:site_name" content={site.name} />
@@ -54,7 +68,14 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     <!-- 首次进站加载幕：每会话一次（sessionStorage），客户端导航与后续刷新不出现；3.5s 兜底必消失 -->
     <script is:inline>
       (function () {
-        try { if (sessionStorage.getItem('woju-veil')) return; } catch (e) {}
+        var seen = false;
+        var force = false;
+        try {
+          seen = !!sessionStorage.getItem('woju-veil');
+          force = sessionStorage.getItem('woju-veil-force') === '1';
+          if (force) sessionStorage.removeItem('woju-veil-force');
+        } catch (e) {}
+        if (seen && !force) return;
         try { sessionStorage.setItem('woju-veil', '1'); } catch (e) {}
         var d = document.createElement('div');
         d.id = 'load-veil';
@@ -77,6 +98,9 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     <Footer />
     <DonateModal />
     <BackToTop />
+    <button id="skin-toggle" class="skin-toggle" aria-label="切换界面风格" data-i18n-attr="aria-label:misc.skinToggle" title="切换界面风格">
+      <Icon name="sparkle" />
+    </button>
     <script>
       import '../lib/glass/main';
     </script>
