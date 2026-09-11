@@ -3,9 +3,14 @@ import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { readingMinutes } from '../../lib/blog';
 
-const posts = (await getCollection('blog')).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
+// 排序：带「置顶」标签的文章固定最前，其余按日期倒序
+const isPinned = (p: (typeof posts)[number]) => p.data.tags?.includes('置顶') ?? false;
+const posts = (await getCollection('blog')).sort((a, b) => {
+  const pa = isPinned(a) ? 1 : 0;
+  const pb = isPinned(b) ? 1 : 0;
+  if (pa !== pb) return pb - pa;
+  return b.data.date.valueOf() - a.data.date.valueOf();
+});
 
 // 统计条：篇数 / 总字数 / 最近更新
 const totalChars = posts.reduce((s, p) => s + (p.body ?? '').replace(/\s/g, '').length, 0);
