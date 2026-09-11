@@ -24,6 +24,8 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- 星空底图在 CSS 里引用，preload 让它更早开始下载（首屏 LCP） -->
     <link rel="preload" as="image" href="/images/bg.webp" fetchpriority="high" />
+    <!-- 中文正文字体：思源宋体分片自托管（unicode-range 按需加载，英文不受影响） -->
+    <link rel="stylesheet" href="/fonts/noto-serif-sc.css" />
     <ClientRouter />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:site_name" content={site.name} />

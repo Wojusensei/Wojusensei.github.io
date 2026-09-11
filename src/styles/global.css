@@ -23,7 +23,7 @@
   --radius: 24px;
   --nav-h: 68px;
   --wrap: 1080px;
-  --font: ui-sans-serif, system-ui, -apple-system, 'SF Pro Display', 'PingFang SC',
+  --font: ui-sans-serif, system-ui, -apple-system, 'SF Pro Display', 'Noto Serif SC',
     'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
   --mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
 }
@@ -1136,3 +1136,6 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   animation: veil-spin 0.9s linear infinite;
 }
 @keyframes veil-spin { to { transform: rotate(360deg); } }
+
+/* ---------- GitHub 工作日志（贡献热力格） ---------- */
+.cal-card { margin-top: 18px; }
