@@ -523,7 +523,8 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .post-cover {
   position: relative;
   flex: 0 0 40%;
-  min-height: 230px;
+  align-self: center;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   /* 封面圆角化：内嵌留边，照片贴在玻璃卡上的质感 */
   margin: 16px 0 16px 16px;
@@ -584,16 +585,17 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 }
 @media (max-width: 880px) {
   .post-item { flex-direction: column; } /* 封面在顶部（DOM 中封面在前） */
-  .post-cover { flex: none; min-height: 0; height: 190px; width: 100%; }
+  .post-cover { flex: none; width: 100%; min-height: 0; }
   .post-cover::before { background: linear-gradient(180deg, transparent 55%, var(--glass-bg) 100%); }
   .post-body { padding: 18px 20px 22px; }
   .post-item h3 { font-size: 1.22rem; }
 }
 
-/* 详情页封面横幅 */
+/* 详情页封面横幅：高度按封面图原始比例自适应，完整显示不裁切 */
 .post-cover-hero {
   margin: 18px 0 4px;
-  height: clamp(180px, 34vw, 320px);
+  aspect-ratio: 16 / 9;
+  max-height: 620px;
   border-radius: 22px;
   overflow: hidden;
   border: 1px solid var(--glass-border);
