@@ -23,7 +23,7 @@ const PR_R = 50;
 const PR_CIRC = 2 * Math.PI * PR_R;
 const prArc = rateNum === null ? `0 ${PR_CIRC}` : `${(rateNum / 100) * PR_CIRC} ${PR_CIRC}`;
 
-// 语言饼图：逐项纳入语言，直到剩余「其他」低于 1%（站长要求），其余进「其他」
+// 语言饼图：固定 12 项 = 权重前 11 种语言 + 「其他」（站长要求，不再随数据浮动）
 const COLORS = [
   '#8fb0ff', '#b48cff', '#5fd4c4', '#f2cd60', '#ff9e9e', '#7fd1ff', '#9aa7bf',
   '#c9a3ff', '#7fd1a0', '#ffb87f', '#e0a3c4', '#a3b8ff', '#8fd1e8', '#d1c07f',
@@ -34,17 +34,9 @@ const CIRC = 2 * Math.PI * R;
 const pieSlices = (() => {
   const langs = [...stats.languages].sort((a, b) => b.bytes - a.bytes);
   const total = langs.reduce((s, d) => s + d.bytes, 0) || 1;
-  // 依次纳入，直至剩余字节占比 < 1%
-  let acc = 0;
-  let n = 0;
-  for (let i = 0; i < langs.length; i++) {
-    acc += langs[i].bytes;
-    n = i + 1;
-    if ((total - acc) / total < 0.01) break;
-  }
-  const shown = langs.slice(0, n);
-  const restBytes = total - acc;
-  const data = restBytes > 0 ? [...shown, { name: '__others__', bytes: restBytes }] : shown;
+  const shown = langs.slice(0, 11);
+  const restBytes = total - shown.reduce((s, d) => s + d.bytes, 0);
+  const data = restBytes > 0 ? [...shown, { name: '__others__', bytes: restBytes }] : [...shown];
   let offset = 0;
   return data.map((d, i) => {
     // 微切片保底 2.5px 弧长：占比再小也在环上可见（track 垫底吸收累计偏移）
