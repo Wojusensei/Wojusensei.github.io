@@ -525,6 +525,9 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   flex: 0 0 40%;
   min-height: 230px;
   overflow: hidden;
+  /* 封面圆角化：内嵌留边，照片贴在玻璃卡上的质感 */
+  margin: 16px 0 16px 16px;
+  border-radius: 18px;
 }
 .post-cover img {
   position: absolute;
