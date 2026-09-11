@@ -1,7 +1,7 @@
 /* ============ Wojusensei · Liquid Glass Design System ============ */
 /* 背景：用户提供的星空摄影图；玻璃：厚壁液态玻璃（真折射，无模糊） */
 
-:root {
+html:root {
   color-scheme: dark;
   --text: rgba(255, 255, 255, 0.96);
   --text-2: rgba(255, 255, 255, 0.74);
@@ -70,7 +70,7 @@ body {
 }
 
 /* 背景照片层（fixed，代替 WebGL 场景） */
-body::before {
+html body::before {
   content: '';
   position: fixed;
   inset: 0;
@@ -81,7 +81,7 @@ body::before {
   will-change: transform;
 }
 /* 可读性薄纱 */
-body::after {
+html body::after {
   content: '';
   position: fixed;
   inset: 0;
@@ -134,7 +134,7 @@ main {
 .section-more { float: right; font-size: 0.92rem; font-weight: 600; }
 
 /* ---------- 液态玻璃卡片（厚壁） ---------- */
-.g-card {
+html .g-card {
   position: relative;
   isolation: isolate;
   border-radius: var(--radius);
@@ -184,7 +184,7 @@ html.lens-ok .g-card::before {
 }
 
 /* ---------- 导航 ---------- */
-.site-header {
+html .site-header {
   position: fixed;
   top: 12px;
   left: 0;
@@ -192,7 +192,7 @@ html.lens-ok .g-card::before {
   z-index: 50;
   height: calc(var(--nav-h) - 24px);
 }
-.site-header .bar {
+html .site-header .bar {
   position: relative;
   isolation: isolate;
   max-width: var(--wrap);
@@ -221,7 +221,7 @@ html.lens-ok .site-header .bar::before {
   -webkit-backdrop-filter: url(#glass-lens) saturate(1.5) brightness(1.1);
   pointer-events: none;
 }
-.logo {
+html .logo {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -235,7 +235,7 @@ html.lens-ok .site-header .bar::before {
 .logo:hover { text-decoration: none; }
 .logo svg { width: 26px; height: 26px; flex: none; display: block; }
 
-.nav-links { display: flex; align-items: center; gap: 2px; }
+html .nav-links { display: flex; align-items: center; gap: 2px; }
 .nav-links a {
   position: relative;
   color: var(--text-2);
@@ -252,7 +252,7 @@ html.lens-ok .site-header .bar::before {
 
 
 /* ---------- 厚壁玻璃按钮 ---------- */
-.g-btn {
+html .g-btn {
   position: relative;
   isolation: isolate;
   display: inline-flex;
@@ -308,7 +308,7 @@ html[data-theme='dark'] #theme-toggle .i-sun { opacity: 1; transform: rotate(0de
 html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-90deg) scale(0.4); }
 
 /* ---------- Hero 主视觉（星空直出大排版 + 右侧玻璃立牌） ---------- */
-.hero-main {
+html .hero-main {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -316,7 +316,7 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   min-height: calc(78dvh - var(--nav-h));
   padding: 76px 0 40px;
 }
-.hero-copy {
+html .hero-copy {
   flex: 1 1 auto;
   position: relative;
   z-index: 1;
@@ -332,11 +332,11 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .hero-copy .hero-tagline { margin: 0 0 14px; font-size: clamp(1.2rem, 2.8vw, 1.65rem); }
 .hero-copy .hero-intro { margin: 0 0 6px; }
 .hero-copy .hero-pc-hint { margin: 0 0 30px; }
-.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+html .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 .hero-cta .g-btn { height: 48px; padding: 0 26px; font-size: 1rem; }
 
 /* 立牌：圆形头像章 + 底部落影，像悬浮在星空上的徽章（无玻璃圈，图 90% 不透明融入星空） */
-.hero-standee {
+html .hero-standee {
   position: relative;
   isolation: isolate;
   flex: none;
@@ -347,7 +347,7 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   border-radius: 50%;
   transform: translateY(0);
 }
-.hero-standee img {
+html .hero-standee img {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -419,13 +419,13 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   .hero-copy { padding: 12px 0 6px; }
   .hero-copy .hero-name { font-size: clamp(2.6rem, 11.5vw, 3.4rem); }
 }
-.hero-greeting {
+html .hero-greeting {
   color: var(--text-2);
   font-weight: 600;
   font-size: clamp(1rem, 2vw, 1.2rem);
   margin: 0 0 10px;
 }
-.hero-name {
+html .hero-name {
   font-size: clamp(2.6rem, 8vw, 5.2rem);
   font-weight: 800;
   letter-spacing: -0.035em;
@@ -440,20 +440,20 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   -webkit-text-fill-color: transparent;
   color: transparent;
 }
-.hero-tagline {
+html .hero-tagline {
   font-size: clamp(1.15rem, 3vw, 1.7rem);
   font-weight: 700;
   margin: 14px 0 16px;
   color: var(--text);
 }
-.hero-intro {
+html .hero-intro {
   max-width: 620px;
   color: var(--text-2);
   font-size: clamp(0.98rem, 2vw, 1.08rem);
   line-height: 1.8;
   margin: 0 0 10px;
 }
-.hero-pc-hint {
+html .hero-pc-hint {
   margin: 0 0 30px;
   color: var(--text-3);
   font-size: 0.82rem;
@@ -1070,19 +1070,19 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 /* ============ 液态玻璃皮肤对毛玻璃新增样式的回退 ============ */
 /* 毛玻璃分支新增的属性在此显式还原，保证液态皮肤观感完整 */
 .g-card,
-.site-header {
+html .site-header {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-.site-header {
+html .site-header {
   border-bottom: none;
 }
-.hero-name { padding-bottom: 0.12em; } /* 保留 j 尾巴修复 */
-:root {
+html .hero-name { padding-bottom: 0.12em; } /* 保留 j 尾巴修复 */
+html:root {
   --font: ui-sans-serif, system-ui, -apple-system, 'SF Pro Display', 'Noto Serif SC',
     'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
 }
 
 /* 首页双布局切换：液态皮肤显示旧 hero，隐藏毛玻璃首页 */
-.home-frosted { display: none; }
-.home-liquid { display: flex; }
+.home-frosted { display: none !important; }
+.home-liquid { display: flex !important; }
