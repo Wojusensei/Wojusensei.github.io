@@ -22,7 +22,6 @@ interface Ripple {
   x: number; y: number; life: number; ttl: number;
 }
 
-const MOUSE_RADIUS = 130;
 const SPRING = 0.014;
 const DAMPING = 0.9;
 
@@ -151,20 +150,12 @@ export function initParticles() {
   // ---- 鼠标/陀螺仪视差（很轻）----
   const parallax = { tx: 0, ty: 0, x: 0, y: 0 };
 
-  let lastMX = 0, lastMY = 0;
   on(window, 'pointermove', ((e: PointerEvent) => {
-    mouse.vx = e.clientX - lastMX;
-    mouse.vy = e.clientY - lastMY;
-    lastMX = e.clientX; lastMY = e.clientY;
-    mouse.x = e.clientX; mouse.y = e.clientY;
-    mouse.on = true;
     const nx = e.clientX / Math.max(W, 1) - 0.5;
     const ny = e.clientY / Math.max(H, 1) - 0.5;
     parallax.tx = nx * -14; // 反向漂移，幅度刻意很轻
     parallax.ty = ny * -9;
   }) as EventListener, { passive: true });
-  on(window, 'pointerleave', () => { mouse.on = false; });
-  on(window, 'blur', () => { mouse.on = false; });
 
   // 移动端陀螺仪视差（iOS 需授权后才有事件，无事件则自动无效果）
   on(window, 'deviceorientation', ((e: DeviceOrientationEvent) => {
@@ -180,10 +171,6 @@ export function initParticles() {
     if (!reduced) ripples.push({ x: e.clientX, y: e.clientY, life: 0, ttl: 0.75 });
   }) as EventListener, { passive: true });
 
-  const mouse = { x: -9999, y: -9999, vx: 0, vy: 0, on: false };
-  // 手电：平滑跟随鼠标的光斑（微型，低强度）
-  const light = { x: -9999, y: -9999, a: 0 };
-
   function step(t: number) {
     ctx!.clearRect(0, 0, W, H);
     ctx!.globalCompositeOperation = 'lighter';
@@ -197,28 +184,6 @@ export function initParticles() {
       parallax.y += (parallax.ty - parallax.y) * 0.045;
       document.documentElement.style.setProperty('--bg-px', parallax.x.toFixed(2) + 'px');
       document.documentElement.style.setProperty('--bg-py', parallax.y.toFixed(2) + 'px');
-    }
-
-    // ---- 手电跟随：位置与强度都做插值，移开时缓缓熄灭 ----
-    if (mouse.on && !reduced) {
-      if (light.x < -999) { light.x = mouse.x; light.y = mouse.y; }
-      light.x += (mouse.x - light.x) * 0.14;
-      light.y += (mouse.y - light.y) * 0.14;
-      light.a += (1 - light.a) * 0.1;
-    } else {
-      light.a += (0 - light.a) * 0.06;
-    }
-    if (light.a > 0.01) {
-      const wide = ctx!.createRadialGradient(light.x, light.y, 0, light.x, light.y, 300);
-      wide.addColorStop(0, `rgba(205, 222, 255, ${0.10 * light.a})`);
-      wide.addColorStop(1, 'rgba(205, 222, 255, 0)');
-      ctx!.fillStyle = wide;
-      ctx!.fillRect(light.x - 300, light.y - 300, 600, 600);
-      const core = ctx!.createRadialGradient(light.x, light.y, 0, light.x, light.y, 120);
-      core.addColorStop(0, `rgba(228, 238, 255, ${0.14 * light.a})`);
-      core.addColorStop(1, 'rgba(228, 238, 255, 0)');
-      ctx!.fillStyle = core;
-      ctx!.fillRect(light.x - 120, light.y - 120, 240, 240);
     }
 
     // ---- 流星雨：持续高频生成，偶发小爆发 ----
@@ -278,39 +243,21 @@ export function initParticles() {
       ctx!.stroke();
     }
 
-    // ---- 星尘粒子 ----
+    // ---- 星尘粒子（自主漂移，不响应鼠标）----
     for (const p of particles) {
       if (!reduced) {
         const anx = p.ax + Math.cos(t * p.speed + p.phase) * p.amp;
         const any = p.ay + Math.sin(t * p.speed * 0.9 + p.phase * 1.7) * p.amp;
         p.vx += (anx - p.x) * SPRING;
         p.vy += (any - p.y) * SPRING;
-        if (mouse.on) {
-          const dx = p.x - mouse.x;
-          const dy = p.y - mouse.y;
-          const d2 = dx * dx + dy * dy;
-          if (d2 < MOUSE_RADIUS * MOUSE_RADIUS) {
-            const d = Math.sqrt(d2) || 1;
-            const f = 1 - d / MOUSE_RADIUS;
-            p.vx += (dx / d) * f * f * 1.1 + mouse.vx * f * 0.22;
-            p.vy += (dy / d) * f * f * 1.1 + mouse.vy * f * 0.22;
-          }
-        }
         p.vx *= DAMPING;
         p.vy *= DAMPING;
         p.x += p.vx;
         p.y += p.vy;
       }
       const twinkle = reduced ? 1 : 0.65 + 0.35 * Math.sin(t * p.tw + p.phase);
-      let boost = 1;
-      if (light.a > 0.01) {
-        const dx = p.x - light.x;
-        const dy = p.y - light.y;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 260) boost = 1 + (1 - d / 260) * 1.8 * light.a;
-      }
-      const s = p.size * (0.9 + 0.1 * boost);
-      ctx!.globalAlpha = Math.min(0.95, p.alpha * twinkle * boost);
+      const s = p.size * 0.955;
+      ctx!.globalAlpha = Math.min(0.95, p.alpha * twinkle);
       ctx!.drawImage(sprite, p.x - s, p.y - s, s * 2, s * 2);
     }
     ctx!.globalAlpha = 1;
