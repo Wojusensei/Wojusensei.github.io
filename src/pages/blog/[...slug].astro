@@ -23,7 +23,7 @@ const older = sorted[idx + 1];
 const coverAbs = post.data.cover ?? '/images/cover-blog.webp';
 ---
 <Base active="blog" title={post.data.title} desc={post.data.description} ogImage={site.url + coverAbs}>
-  <article class="section wrap" style="margin-top:24px;max-width:820px">
+  <article class="section wrap" style="margin-top:24px;max-width:960px">
     <a href="/blog/" data-i18n="blog.back">← 返回列表</a>
     <div class="post-cover-hero" transition:name={`post-cover-${post.id}`} aria-hidden="true">
       <img src={post.data.cover ?? '/images/cover-blog.webp'} width="1200" height="765" alt="" loading="eager" />
@@ -37,7 +37,7 @@ const coverAbs = post.data.cover ?? '/images/cover-blog.webp';
         <span data-lang-en style="display:none">~{minutes} min read</span>
       </div>
     </header>
-    <div class="g-card" style="padding:36px clamp(20px,4vw,44px)">
+    <div class="g-card prose-card no-tilt" style="padding:40px clamp(22px,4.5vw,52px)">
       <div class="prose">
         <Content />
       </div>

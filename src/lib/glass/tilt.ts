@@ -62,7 +62,8 @@ export function initTilt() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!window.matchMedia('(hover: hover)').matches) return; // 触屏不启用
 
-  document.querySelectorAll<HTMLElement>('.g-card').forEach((el) => {
+  // no-tilt 标记的卡片（如文章正文）不参与倾斜，保证长文阅读稳定
+  document.querySelectorAll<HTMLElement>('.g-card:not(.no-tilt)').forEach((el) => {
     const s: TiltState = {
       el, rx: 0, ry: 0, lift: 0, trx: 0, try_: 0, tlift: 0,
       pressing: false, hovering: false, settled: true,
