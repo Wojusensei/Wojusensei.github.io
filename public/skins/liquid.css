@@ -41,6 +41,20 @@ html[data-theme='dark'] {
   --code-bg: rgba(4, 7, 16, 0.55);
 }
 
+html[data-theme='light'] {
+  /* 亮色档可读性：白玻璃上的文字转深色（黑字），链接用深蓝保证对比度 */
+  color-scheme: light;
+  --text: rgba(22, 24, 38, 0.96);
+  --text-2: rgba(22, 24, 38, 0.78);
+  --text-3: rgba(22, 24, 38, 0.58);
+  --link: #3d56c4;
+}
+html[data-theme='light'] a:hover { color: #6a7ce0; }
+/* 大标题渐变字起点跟随主题：亮色下从近墨起步，避免白起始段在亮背景里消失 */
+html[data-theme='light'] .hero-name {
+  background-image: linear-gradient(120deg, #1c1e30 30%, #4c5fd0 70%, #7a5fd0);
+}
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 html, body { margin: 0; padding: 0; }
@@ -523,8 +537,12 @@ html .hero-pc-hint {
 .post-cover {
   position: relative;
   flex: 0 0 40%;
-  min-height: 230px;
+  align-self: center;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
+  /* 与毛玻璃分支一致：封面圆角化，内嵌留边贴在玻璃卡上 */
+  margin: 16px 0 16px 16px;
+  border-radius: 18px;
 }
 .post-cover img {
   position: absolute;
@@ -581,16 +599,17 @@ html .hero-pc-hint {
 }
 @media (max-width: 880px) {
   .post-item { flex-direction: column; } /* 封面在顶部（DOM 中封面在前） */
-  .post-cover { flex: none; min-height: 0; height: 190px; width: 100%; }
+  .post-cover { flex: none; width: 100%; min-height: 0; margin: 0; border-radius: 0; }
   .post-cover::before { background: linear-gradient(180deg, transparent 55%, var(--glass-bg) 100%); }
   .post-body { padding: 18px 20px 22px; }
   .post-item h3 { font-size: 1.22rem; }
 }
 
-/* 详情页封面横幅 */
+/* 详情页封面横幅：与毛玻璃分支一致，高度按 16:9 自适应并设上限 */
 .post-cover-hero {
   margin: 18px 0 4px;
-  height: clamp(180px, 34vw, 320px);
+  aspect-ratio: 16 / 9;
+  max-height: 620px;
   border-radius: 22px;
   overflow: hidden;
   border: 1px solid var(--glass-border);
@@ -1092,8 +1111,8 @@ html:root {
 .site-header { background: transparent; border-bottom: none; }
 .hero-name { padding-bottom: 0.12em; } /* 保留 j 尾巴修复 */
 
-/* 亮暗切换联动背景调色：星空图随主题提亮/压暗 */
-html[data-theme='light'] body::before { filter: brightness(1.4) saturate(0.85); }
+/* 亮暗切换联动背景调色：星空图随主题提亮/压暗（亮色提亮幅度收敛，配合黑字） */
+html[data-theme='light'] body::before { filter: brightness(1.25) saturate(0.85); }
 html[data-theme='dark'] body::before { filter: none; }
 body::before { transition: filter 0.6s ease; }
 

@@ -5,7 +5,7 @@
 //   - 其余同源静态资源    ：缓存优先 + 后台刷新（stale-while-revalidate）
 //   - 跨域请求（访客计数等）：完全不干预
 // 缓存版本：改动策略或想强制刷新底图时递增 VERSION，activate 会自动清掉旧版本缓存
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = `woju-${VERSION}`;
 
 // 构建最后一步由 scripts/inject-sw-manifest.mjs 注入精确的预缓存清单
