@@ -1223,7 +1223,12 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   font-size: clamp(2rem, 4vw, 2.9rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--text);
+  /* 渐变字：起点跟随 --text（暗色近白 / 亮色近墨），向强调色过渡，两种主题都有对比度 */
+  background: linear-gradient(120deg, var(--text) 25%, var(--accent) 65%, var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 .pc-bio { margin: 0 0 4px; font-size: 1.12rem; font-weight: 700; color: var(--text); }
 .pc-bio2 { margin: 0 0 8px; font-size: 0.95rem; color: var(--text-2); }
