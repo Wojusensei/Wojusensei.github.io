@@ -1096,3 +1096,6 @@ html:root {
 html[data-theme='light'] body::before { filter: brightness(1.4) saturate(0.85); }
 html[data-theme='dark'] body::before { filter: none; }
 body::before { transition: filter 0.6s ease; }
+
+/* 回顶按钮位置防御（fixed right 锚定，防旧级联残留） */
+html .back-top { left: auto; }
