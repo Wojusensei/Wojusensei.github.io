@@ -5,6 +5,14 @@ import * as csstree from 'css-tree';
 import { readFile, writeFile } from 'node:fs/promises';
 
 const category = process.argv[2] ?? 'c1';
+// 回归实测发现会改变手机端渲染的 C2 规则（html 前缀在此压过 global 的移动端媒体查询，属于承重墙）
+const C2_KEEP = new Set([
+  'html .logo',
+  'html .hero-main',
+  'html .hero-copy',
+  '(max-width:760px)||html .site-header',
+  '(max-width:760px)||html .section',
+]);
 const src = await readFile('public/skins/liquid.css', 'utf8');
 const globalSrc = await readFile('src/styles/global.css', 'utf8');
 
@@ -63,6 +71,7 @@ for (const r of liquid) {
     ? 'c1'
     : prefixed && candidates.some((g) => g.selector === stripped) ? 'c2' : null;
   if (hit !== category) continue;
+  if (category === 'c2' && (C2_KEEP.has(r.selector) || C2_KEEP.has(`${r.media}||${r.selector}`))) continue;
   ranges.push([r.start, r.end]);
 }
 ranges.sort((a, b) => a[0] - b[0]);
