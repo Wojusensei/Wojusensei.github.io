@@ -252,7 +252,7 @@ html .nav-links { display: flex; align-items: center; gap: 2px; }
 
 
 /* ---------- 厚壁玻璃按钮 ---------- */
-html .g-btn {
+.g-btn {
   position: relative;
   isolation: isolate;
   display: inline-flex;
@@ -817,8 +817,8 @@ html .hero-pc-hint {
 }
 
 @media (max-width: 760px) {
-  .site-header { left: 12px; right: 12px; }
-  .nav-links { display: none; }
+  html .site-header { left: 12px; right: 12px; }
+  html .nav-links { display: none; }
   .nav-links.open {
     display: flex;
     flex-direction: column;
@@ -836,8 +836,8 @@ html .hero-pc-hint {
     padding: 10px;
     box-shadow: var(--glass-shadow);
   }
-  .menu-toggle { display: inline-flex !important; }
-  .section { margin: 52px 0; }
+  html .menu-toggle { display: inline-flex !important; }
+  html .section { margin: 52px 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

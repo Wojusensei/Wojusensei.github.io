@@ -1223,14 +1223,7 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   font-size: clamp(2rem, 4vw, 2.9rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  background: linear-gradient(120deg, #fff 30%, var(--accent) 75%);
-}
-html[data-skin='frosted'][data-theme='light'] .pc-name {
-  background: linear-gradient(120deg, #221d3d 30%, var(--accent) 75%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: var(--text);
 }
 .pc-bio { margin: 0 0 4px; font-size: 1.12rem; font-weight: 700; color: var(--text); }
 .pc-bio2 { margin: 0 0 8px; font-size: 0.95rem; color: var(--text-2); }
