@@ -38,9 +38,20 @@ const nav = [
   document.addEventListener('astro:page-load', () => {
     const toggle = document.getElementById('menu-toggle');
     const nav = document.getElementById('nav-links');
+    const bar = toggle?.closest('.bar');
     toggle?.addEventListener('click', () => {
-      nav?.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', nav?.classList.contains('open') ? 'true' : 'false');
+      const open = nav?.classList.toggle('open') ?? false;
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      // 展开时把菜单挪出 .bar：.bar 自带 backdrop-filter，会把后代玻璃的取景
+      // 限制在导航条内部，下拉面板模糊不到底下的页面内容（表现为透明）
+      if (!nav || !bar) return;
+      const header = bar.parentElement;
+      if (open) {
+        if (nav.parentElement !== header) header?.appendChild(nav);
+      } else {
+        const controls = bar.querySelector('.header-controls');
+        if (nav.parentElement === header && controls) bar.insertBefore(nav, controls);
+      }
     });
   });
 </script>

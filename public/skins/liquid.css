@@ -533,16 +533,13 @@ html .hero-pc-hint {
   gap: 0;
   color: var(--text);
 }
+/* html .g-card 的厚壁内边距会让封面四周留白，博客列表卡需要封面通栏贴边 */
+html .post-item { padding: 0; }
 .post-item:hover { text-decoration: none; }
 .post-cover {
   position: relative;
   flex: 0 0 40%;
-  align-self: center;
-  aspect-ratio: 16 / 9;
   overflow: hidden;
-  /* 与毛玻璃分支一致：封面圆角化，内嵌留边贴在玻璃卡上 */
-  margin: 16px 0 16px 16px;
-  border-radius: 18px;
 }
 .post-cover img {
   position: absolute;
@@ -556,7 +553,8 @@ html .hero-pc-hint {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(90deg, var(--glass-bg) 0%, transparent 30%);
+  /* PC 端封面在左、玻璃正文在右：右缘向玻璃过渡；封面取消留边圆角，通栏贴边 */
+  background: linear-gradient(270deg, var(--glass-bg) 0%, transparent 30%);
   pointer-events: none;
 }
 .post-body {
@@ -598,8 +596,9 @@ html .hero-pc-hint {
   .post-item:hover .go { transform: translateX(3px); }
 }
 @media (max-width: 880px) {
-  .post-item { flex-direction: column; } /* 封面在顶部（DOM 中封面在前） */
-  .post-cover { flex: none; width: 100%; min-height: 0; margin: 0; border-radius: 0; }
+  /* 手机端改为上下关系：封面通栏铺满顶部，玻璃正文直接衔接 */
+  .post-item { flex-direction: column; }
+  .post-cover { flex: none; width: 100%; min-height: 0; aspect-ratio: 16 / 9; }
   .post-cover::before { background: linear-gradient(180deg, transparent 55%, var(--glass-bg) 100%); }
   .post-body { padding: 18px 20px 22px; }
   .post-item h3 { font-size: 1.22rem; }
@@ -846,15 +845,17 @@ html .hero-pc-hint {
     top: calc(100% + 10px);
     right: 0;
     left: 0;
-    background: var(--glass-bg-strong);
+    /* 菜单可读性优先：高不透明底色，底下内容只允许极淡透出（亮色档单独指定浅色玻璃） */
+    background: rgb(10 14 28 / 0.9);
     /* 毛玻璃：模糊透出的页面内容，避免底下文字干扰菜单阅读（仅移动端下拉面板） */
-    backdrop-filter: blur(18px) saturate(1.5);
-    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
     border: 1px solid var(--glass-border);
     border-radius: 22px;
     padding: 10px;
     box-shadow: var(--glass-shadow);
   }
+  html[data-theme='light'] .nav-links.open { background: rgb(248 250 255 / 0.94); }
   html .menu-toggle { display: inline-flex !important; }
   html .section { margin: 52px 0; }
 }

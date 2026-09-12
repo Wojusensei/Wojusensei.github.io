@@ -530,12 +530,7 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .post-cover {
   position: relative;
   flex: 0 0 40%;
-  align-self: center;
-  aspect-ratio: 16 / 9;
   overflow: hidden;
-  /* 封面圆角化：内嵌留边，照片贴在玻璃卡上的质感 */
-  margin: 16px 0 16px 16px;
-  border-radius: 18px;
 }
 .post-cover img {
   position: absolute;
@@ -549,7 +544,8 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(90deg, var(--glass-bg) 0%, transparent 30%);
+  /* PC 端封面在左、玻璃正文在右：右缘向玻璃过渡；封面取消留边圆角，通栏贴边 */
+  background: linear-gradient(270deg, var(--glass-bg) 0%, transparent 30%);
   pointer-events: none;
 }
 .post-body {
@@ -591,9 +587,9 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   .post-item:hover .go { transform: translateX(3px); }
 }
 @media (max-width: 880px) {
-  .post-item { flex-direction: column; } /* 封面在顶部（DOM 中封面在前） */
-  /* 手机端取消留白：玻璃直接衔接图片（全宽衔接，恢复原效果） */
-  .post-cover { flex: none; width: 100%; min-height: 0; margin: 0; border-radius: 0; }
+  /* 手机端改为上下关系：封面通栏铺满顶部，玻璃正文直接衔接 */
+  .post-item { flex-direction: column; }
+  .post-cover { flex: none; width: 100%; min-height: 0; aspect-ratio: 16 / 9; }
   .post-cover::before { background: linear-gradient(180deg, transparent 55%, var(--glass-bg) 100%); }
   .post-body { padding: 18px 20px 22px; }
   .post-item h3 { font-size: 1.22rem; }
@@ -864,15 +860,17 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
     top: calc(100% + 10px);
     right: 0;
     left: 0;
-    background: var(--glass-bg-strong);
+    /* 菜单可读性优先：高不透明底色，底下内容只允许极淡透出（亮色档单独指定浅色玻璃） */
+    background: rgb(18 18 30 / 0.92);
     /* 毛玻璃：模糊透出的页面内容，避免底下文字干扰菜单阅读（仅移动端下拉面板） */
-    backdrop-filter: blur(18px) saturate(1.5);
-    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
     border: 1px solid var(--glass-border);
     border-radius: 22px;
     padding: 10px;
     box-shadow: var(--glass-shadow);
   }
+  html[data-skin='frosted'][data-theme='light'] .nav-links.open { background: rgb(250 248 253 / 0.94); }
   .menu-toggle { display: inline-flex !important; }
   .section { margin: 52px 0; }
 }
