@@ -28,13 +28,14 @@ function start() {
   initBaFx();
 
   // 右下角皮肤切换：写入偏好 → 加载幕 → 跳转到对方模式的首页
+  // （URL 带时间戳击穿 HTTP 缓存，确保拿到新构建的 HTML）
   document.getElementById('skin-toggle')?.addEventListener('click', () => {
     const next = skin === 'liquid' ? 'frosted' : 'liquid';
     try {
       localStorage.setItem('woju-skin', next);
       sessionStorage.setItem('woju-veil-force', '1');
     } catch { /* 存储不可用时静默，仍然跳转 */ }
-    location.href = '/'; // 立即换成对方模式的首页
+    location.href = '/?s=' + Date.now(); // 立即换成对方模式的首页
   });
 }
 
