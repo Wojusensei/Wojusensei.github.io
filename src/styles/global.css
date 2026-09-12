@@ -584,7 +584,8 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 }
 @media (max-width: 880px) {
   .post-item { flex-direction: column; } /* 封面在顶部（DOM 中封面在前） */
-  .post-cover { flex: none; width: 100%; min-height: 0; }
+  /* 手机端取消留白：玻璃直接衔接图片（全宽衔接，恢复原效果） */
+  .post-cover { flex: none; width: 100%; min-height: 0; margin: 0; border-radius: 0; }
   .post-cover::before { background: linear-gradient(180deg, transparent 55%, var(--glass-bg) 100%); }
   .post-body { padding: 18px 20px 22px; }
   .post-item h3 { font-size: 1.22rem; }
