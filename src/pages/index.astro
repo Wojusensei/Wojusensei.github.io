@@ -92,17 +92,7 @@ const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
   </div>
 </Base>
 <script>
-  // QQ 号复制（资料卡社交按钮）+ 访客数量同步（从不蒜子页脚数值复制到资料卡统计）
-  let uvTries = 0;
-  function syncVisitorCount() {
-    const src = document.getElementById('busuanzi_value_site_uv');
-    const dst = document.getElementById('pc-uv');
-    if (src && dst && src.textContent && src.textContent !== '-') {
-      dst.textContent = src.textContent;
-      return;
-    }
-    if (++uvTries < 40) setTimeout(syncVisitorCount, 300);
-  }
+  // QQ 号复制（资料卡社交按钮）；访客数量由 Footer 统一管理（缓存 + 不蒜子回填）
   document.addEventListener('astro:page-load', () => {
     document.querySelectorAll<HTMLElement>('[data-copy-text]').forEach((btn) => {
       if (btn.dataset.bound) return;
@@ -111,7 +101,5 @@ const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
         try { await navigator.clipboard.writeText(btn.dataset.copyText!); } catch { /* 静默 */ }
       });
     });
-    uvTries = 0;
-    syncVisitorCount();
   });
 </script>
