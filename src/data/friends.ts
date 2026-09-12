@@ -13,4 +13,12 @@ export const friends = [
     avatarSrc: 'https://github.com/patchouli-cn.png',
     shot: '/friends/shots/patchouli-cn.webp',
   },
+  {
+    name: 'shotamiao',
+    url: 'https://shotamiao.online',
+    desc: '在代码、网络安全和游戏间穿梭的普通人。近期正埋头于计算机科学基础与线性代数。',
+    avatar: '/friends/shotamiao.jpg',
+    avatarSrc: 'https://origin.picgo.net/2026/07/14/Image_1779620623863_953cf3666e3dac54e88.jpg',
+    shot: '/friends/shots/shotamiao.webp',
+  },
 ] as const;

@@ -962,7 +962,15 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
 .plugin-list { display: flex; flex-direction: column; }
 
 /* ---------- 友链卡片 ---------- */
-.friend-card { display: flex; align-items: center; gap: 16px; color: var(--text); overflow: hidden; }
+.friend-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text);
+  overflow: hidden;
+  min-height: 168px; /* 加高：给底图蒙版和文字更充裕的展示空间 */
+  padding: 20px 24px;
+}
 .friend-card:hover { text-decoration: none; }
 /* 对方网站首页截图：50% 透明铺在玻璃上做底图蒙版，便于多友链时一眼区分 */
 .fc-shot {
