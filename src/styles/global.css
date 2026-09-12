@@ -83,6 +83,14 @@ body::before {
 }
 html[data-theme='light'] body::before { filter: brightness(1.55) saturate(1.05); }
 html[data-theme='dark'] body::before { filter: brightness(1); }
+/* 毛玻璃亮色档：背景已是明亮的模糊插画，文字转深色保证对比度 */
+html[data-skin='frosted'][data-theme='light'] {
+  --text: rgba(30, 26, 50, 0.96);
+  --text-2: rgba(30, 26, 50, 0.76);
+  --text-3: rgba(30, 26, 50, 0.54);
+  --link: #6d5bd0;
+  --glass-border: rgba(30, 26, 50, 0.16);
+}
 /* 可读性薄纱 */
 body::after {
   content: '';
@@ -1216,6 +1224,9 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   font-weight: 800;
   letter-spacing: -0.02em;
   background: linear-gradient(120deg, #fff 30%, var(--accent) 75%);
+}
+html[data-skin='frosted'][data-theme='light'] .pc-name {
+  background: linear-gradient(120deg, #221d3d 30%, var(--accent) 75%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
