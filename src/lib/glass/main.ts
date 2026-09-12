@@ -27,15 +27,18 @@ function start() {
   // 蔚蓝档案点击 + 光标拖尾特效：两种皮肤都保留（站长要求）
   initBaFx();
 
-  // 右下角皮肤切换：写入偏好 → 加载幕 → 跳转到对方模式的首页
-  // （URL 带时间戳击穿 HTTP 缓存，确保拿到新构建的 HTML）
+  // 右下角皮肤切换：写入偏好 → 加载幕 → 留在当前页面换肤
+  // 方向以 localStorage 为准（客户端导航后 dataset.skin 可能滞后）；
+  // URL 带时间戳击穿 HTTP 缓存，确保拿到新构建的 HTML
   document.getElementById('skin-toggle')?.addEventListener('click', () => {
-    const next = skin === 'liquid' ? 'frosted' : 'liquid';
+    let cur = 'frosted';
+    try { cur = localStorage.getItem('woju-skin') || 'frosted'; } catch { /* 存储不可用时按默认处理 */ }
+    const next = cur === 'liquid' ? 'frosted' : 'liquid';
     try {
       localStorage.setItem('woju-skin', next);
       sessionStorage.setItem('woju-veil-force', '1');
     } catch { /* 存储不可用时静默，仍然跳转 */ }
-    location.href = '/?s=' + Date.now(); // 立即换成对方模式的首页
+    location.href = location.pathname + '?s=' + Date.now();
   });
 }
 
