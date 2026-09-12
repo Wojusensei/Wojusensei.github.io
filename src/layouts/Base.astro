@@ -31,13 +31,17 @@ const fullTitle = title ? `${title} · ${site.name}` : site.name;
     <link rel="stylesheet" href="/skins/liquid.css" data-skin-liquid />
     <script is:inline>
       (function () {
-        var skin = 'frosted';
-        try { skin = localStorage.getItem('woju-skin') || 'frosted'; } catch (e) {}
-        document.documentElement.dataset.skin = skin;
-        if (skin !== 'liquid') {
+        // 双皮肤在客户端导航后不会自动保留：View Transitions 换入的 <html>
+        // 不带 data-skin，液态玻璃样式层也会恢复默认启用，需按存储再钉一次
+        function applySkin() {
+          var skin = 'frosted';
+          try { skin = localStorage.getItem('woju-skin') || 'frosted'; } catch (e) {}
+          document.documentElement.dataset.skin = skin;
           var l = document.querySelector('link[data-skin-liquid]');
-          if (l) l.disabled = true;
+          if (l) l.disabled = skin !== 'liquid';
         }
+        applySkin();
+        document.addEventListener('astro:after-swap', applySkin);
       })();
     </script>
     <ClientRouter />
