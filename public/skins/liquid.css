@@ -1,5 +1,12 @@
 /* ============ Wojusensei · Liquid Glass Design System ============ */
 /* 背景：用户提供的星空摄影图；玻璃：厚壁液态玻璃（真折射，无模糊） */
+/*
+ * 瘦身说明：本文件只保留「液态皮肤相对毛玻璃分支（global.css）的差异」。
+ * 与 global.css 逐字相同的规则已删除，由 global.css 统一提供（改布局只需动一份）。
+ * 留下的规则分两类，删任何一条都会改变液态外观或手机端布局：
+ *   1. 皮肤差异 —— 玻璃材质、颜色令牌、折射、背景图等刻意的不同；
+ *   2. 级联承重 —— html 前缀提权规则，用于压过 global 的同名/媒体查询规则。
+ */
 
 html:root {
   color-scheme: dark;
@@ -55,22 +62,19 @@ html[data-theme='light'] .hero-name {
   background-image: linear-gradient(120deg, #1c1e30 30%, #4c5fd0 70%, #7a5fd0);
 }
 
-/* 蔚蓝档案像素光标（指针本体来自 BA-Pointer 项目，经站长手工抠图） */
-/* 背景照片层（fixed，代替 WebGL 场景） */
+/* ---------- 背景 ---------- */
+/* 液态用未模糊的星空原图（毛玻璃用预模糊插画 bg-frosted.webp），并保留鼠标/陀螺仪视差 */
 html body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -2;
   background: url('/images/bg.webp') center / cover no-repeat;
-  /* 鼠标/陀螺仪视差（幅度很轻），scale 防止边缘露底 */
   transform: translate3d(var(--bg-px, 0px), var(--bg-py, 0px), 0) scale(1.04);
   will-change: transform;
 }
-/* 可读性薄纱 */
-/* ---------- 星尘粒子层（在薄纱之上、内容之下，会被玻璃折射） ---------- */
-/* ---------- 布局 ---------- */
-/* ---------- 液态玻璃卡片（厚壁） ---------- */
+
+/* ---------- 液态玻璃卡片（厚壁，无模糊，靠折射） ---------- */
 html .g-card {
   position: relative;
   isolation: isolate;
@@ -88,8 +92,8 @@ html .g-card {
   content-visibility: auto;
   contain-intrinsic-size: auto 150px;
 }
-/* 顶部镜面高光 */
-/* ---------- 导航 ---------- */
+
+/* ---------- 导航（悬浮胶囊条，与毛玻璃的通栏条不同） ---------- */
 html .site-header {
   position: fixed;
   top: 12px;
@@ -117,6 +121,7 @@ html .site-header .bar {
   padding: 0 10px 0 18px;
   transition: background-color 0.6s ease, border-color 0.6s ease;
 }
+/* 级联承重：压过 global 760px 媒体查询对 .site-header 的通栏化，保住液态胶囊条的左右留白 */
 html .logo {
   display: flex;
   align-items: center;
@@ -128,9 +133,10 @@ html .logo {
   margin-right: auto;
   white-space: nowrap;
 }
-/* ---------- 厚壁玻璃按钮 ---------- */
-/* 主题切换：两个图标同尺寸叠放、精确居中 */
+
 /* ---------- Hero 主视觉（星空直出大排版 + 右侧玻璃立牌） ---------- */
+/* 级联承重：global 的 1020/760px 媒体查询会改手机端 hero 的留白与高度，
+   这两条 html 前缀规则保证液态 hero 在窄屏也维持桌面排版（实测删除即回归） */
 html .hero-main {
   display: flex;
   align-items: center;
@@ -150,39 +156,17 @@ html .hero-copy {
   text-align: center;
   padding: 30px 0;
 }
-/* 立牌：圆形头像章 + 底部落影，像悬浮在星空上的徽章（无玻璃圈，图 90% 不透明融入星空） */
-/* 头像周围的旋转渐变圆环：蓝白 → 蓝 → 淡紫循环流动（与头像留有小间隙） */
+/* 头像周围旋转渐变圆环的旋转动画（圆环本体样式由 global 提供） */
 @keyframes hs-spin {
   to { transform: rotate(360deg); }
 }
-/* 落座光晕：把圆章「安」在星空上 */
-/* 底部投影：椭圆软影垫在圆章下沿 */
-@media (prefers-reduced-motion: no-preference) {
-  /* 与鼠标的互动由 heroAvatar.ts 连续插值驱动（写内联 transform），CSS 不再做 hover 跳变 */
-  }
-/* 窄屏：立牌直接收起（按站长要求：立牌只存在于并排布局，不挪到文字下方） */
-@media (max-width: 1020px) {
-  }
-@media (max-width: 760px) {
-  }
-/* ---------- 卡片网格 ---------- */
-@media (max-width: 880px) {
-  }
-@media (max-width: 620px) {
-  }
 
 /* ---------- 博客 ---------- */
-/* 博客统计条 */
-/* 博客列表：单列通栏大卡（版面宽度 = 1240px 砍 15%） */
-/* html .g-card 的厚壁内边距会让封面四周留白，博客列表卡需要封面通栏贴边 */
+/* 级联承重：html .g-card 的 24px 厚壁内边距特异性高于 .post-item，会让封面四周留白，
+   博客列表卡需要封面通栏贴边，故用 html 前缀压回 */
 html .post-item { padding: 0; }
-@media (prefers-reduced-motion: no-preference) {
-  }
-@media (max-width: 880px) {
-  /* 手机端改为上下关系：封面通栏铺满顶部，玻璃正文直接衔接 */
-  }
 
-/* 详情页封面横幅：与毛玻璃分支一致，高度按 16:9 自适应并设上限 */
+/* 代码块底色随皮肤令牌走（与 global 版本存在差异，保留） */
 .prose pre {
   background: var(--code-bg);
   border: 1px solid var(--glass-border);
@@ -192,23 +176,10 @@ html .post-item { padding: 0; }
   font-size: 0.88rem;
   line-height: 1.7;
 }
-/* 上一篇 / 下一篇 */
-@media (max-width: 640px) {
-  }
 
-/* ---------- 关于页 ---------- */
-/* ---------- 打赏 ---------- */
-/* 弹窗 */
-/* ---------- 评论占位 ---------- */
-/* 加载兜底：utteranc.es 偶发慢时面板不塌陷 */
-/* ---------- 页脚 ---------- */
-/* ---------- 404 ---------- */
-/* ---------- 响应式 ---------- */
-@media (max-width: 480px) {
-  /* 联系方式行重排：图标+名称+复制按钮一行，完整链接独占第二行不再拥挤 */
-  }
-
+/* ---------- 移动端 ---------- */
 @media (max-width: 760px) {
+  /* 级联承重：保住液态胶囊条在窄屏的左右留白（同上方 .site-header 说明） */
   html .site-header { left: 12px; right: 12px; }
   .nav-links.open {
     display: flex;
@@ -229,29 +200,13 @@ html .post-item { padding: 0; }
     box-shadow: var(--glass-shadow);
   }
   html[data-theme='light'] .nav-links.open { background: rgb(248 250 255 / 0.94); }
+  /* 级联承重：液态的 section 纵向留白比毛玻璃窄屏档更大 */
   html .section { margin: 52px 0; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  }
-
-/* ---------- 贡献板块 ---------- */
-@media (max-width: 880px) { }
-@media (max-width: 480px) { }
-/* PR 环形图大卡：全端通用（窄屏 span 2 占满一行） */
-@media (min-width: 881px) {
-  }
-@media (max-width: 480px) {
-  }
-/* 语言较多，图例两列网格；按列优先排（左列 = 权重前几名，右列接续），窄屏单列 */
-@media (max-width: 640px) {
-  }
 /* ---------- 友链卡片 ---------- */
 .friend-card { display: flex; align-items: center; gap: 16px; color: var(--text); overflow: hidden; }
-/* 对方网站首页截图：50% 透明铺在玻璃上做底图蒙版，便于多友链时一眼区分 */
-/* 文字侧的护读渐变（随亮暗主题走） */
-@media (prefers-reduced-motion: no-preference) {
-  }
+
 /* ---------- 页面切换衔接动画（Astro View Transitions） ---------- */
 /* Chromium 系（Edge/Chrome 走原生 View Transitions）：旧页快速淡出微上移，新页自下方轻轻浮入 */
 @keyframes woju-page-out {
@@ -260,10 +215,8 @@ html .post-item { padding: 0; }
 @keyframes woju-page-in {
   from { opacity: 0; transform: translateY(14px); }
 }
-@media (prefers-reduced-motion: reduce) {
-  }
 
-/* ---------- 返回顶部玻璃按钮 ---------- */
+/* ---------- 返回顶部玻璃按钮（液态版不带 backdrop blur，尺寸/动效与 global 有差异） ---------- */
 .back-top {
   position: fixed;
   right: 22px;
@@ -280,8 +233,8 @@ html .post-item { padding: 0; }
   transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1),
     visibility 0s linear 0.28s, background-color 0.3s ease, border-color 0.6s ease;
 }
-@media (max-width: 640px) {
-  }@keyframes reveal-in {
+/* 渐入动画：与 global 版本存在差异，保留液态自己的关键帧 */
+@keyframes reveal-in {
   from {
     opacity: 0;
     translate: 0 16px;
@@ -294,8 +247,7 @@ html .post-item { padding: 0; }
   }
 }
 
-/* 跳到正文（键盘可达性）：平时不可见，Tab 聚焦时浮现 */
-/* ============ 液态玻璃皮肤对毛玻璃新增样式的回退 ============ */
+/* ============ 液态皮肤对毛玻璃新增样式的回退 ============ */
 /* 毛玻璃分支新增的属性在此显式还原，保证液态皮肤观感完整 */
 .g-card,
 html .site-header {
@@ -307,6 +259,7 @@ html .site-header {
 }
 html .hero-name { padding-bottom: 0.12em; } /* 保留 j 尾巴修复 */
 html:root {
+  /* 液态标题用无衬线字体栈（毛玻璃正文为思源宋体） */
   --font: ui-sans-serif, system-ui, -apple-system, 'SF Pro Display', 'Noto Serif SC',
     'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
 }
@@ -315,7 +268,6 @@ html:root {
 .home-frosted { display: none !important; }
 .home-liquid { display: flex !important; }
 
-/* ============ 液态皮肤对毛玻璃时期全局新增样式的完整回退（保证一丝不改） ============ */
 .g-card { will-change: transform; }
 .site-header { background: transparent; border-bottom: none; }
 .hero-name { padding-bottom: 0.12em; } /* 保留 j 尾巴修复 */
