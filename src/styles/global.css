@@ -77,8 +77,12 @@ body::before {
   z-index: -2;
   /* 毛玻璃分支：全屏模糊插画（预模糊压暗版，构建产物 33KB） */
   background: url('/images/bg-frosted.webp') center / cover no-repeat;
-  will-change: transform;
+  /* 亮暗切换联动背景调色：亮色提亮 / 暗色压暗，过渡平滑 */
+  transition: filter 0.6s ease;
+  will-change: filter;
 }
+html[data-theme='light'] body::before { filter: brightness(1.55) saturate(1.05); }
+html[data-theme='dark'] body::before { filter: brightness(1); }
 /* 可读性薄纱 */
 body::after {
   content: '';
@@ -1038,6 +1042,7 @@ html[data-theme='dark'] #theme-toggle .i-moon { opacity: 0; transform: rotate(-9
   position: fixed;
   right: 22px;
   bottom: 22px;
+  left: auto;
   z-index: 60;
   width: 46px;
   height: 46px;

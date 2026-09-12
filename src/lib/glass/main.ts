@@ -27,14 +27,14 @@ function start() {
   // 蔚蓝档案点击 + 光标拖尾特效：两种皮肤都保留（站长要求）
   initBaFx();
 
-  // 右下角皮肤切换：写入偏好 → 加载幕 → 整页刷新应用新皮肤
+  // 右下角皮肤切换：写入偏好 → 加载幕 → 跳转到对方模式的首页
   document.getElementById('skin-toggle')?.addEventListener('click', () => {
     const next = skin === 'liquid' ? 'frosted' : 'liquid';
     try {
       localStorage.setItem('woju-skin', next);
       sessionStorage.setItem('woju-veil-force', '1');
-    } catch { /* 存储不可用时静默，仍然刷新 */ }
-    location.reload();
+    } catch { /* 存储不可用时静默，仍然跳转 */ }
+    location.href = '/'; // 立即换成对方模式的首页
   });
 }
 

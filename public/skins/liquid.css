@@ -1086,3 +1086,13 @@ html:root {
 /* 首页双布局切换：液态皮肤显示旧 hero，隐藏毛玻璃首页 */
 .home-frosted { display: none !important; }
 .home-liquid { display: flex !important; }
+
+/* ============ 液态皮肤对毛玻璃时期全局新增样式的完整回退（保证一丝不改） ============ */
+.g-card { will-change: transform; }
+.site-header { background: transparent; border-bottom: none; }
+.hero-name { padding-bottom: 0.12em; } /* 保留 j 尾巴修复 */
+
+/* 亮暗切换联动背景调色：星空图随主题提亮/压暗 */
+html[data-theme='light'] body::before { filter: brightness(1.4) saturate(0.85); }
+html[data-theme='dark'] body::before { filter: none; }
+body::before { transition: filter 0.6s ease; }
