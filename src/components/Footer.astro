@@ -24,10 +24,19 @@ const year = new Date().getFullYear();
     }
   }
 
-  // 把访客数回填到首页资料卡统计
+  // 把访客数回填到首页资料卡统计（若曾被隐藏则恢复显示）
   function applyProfileCard(v: string) {
     const pc = document.getElementById('pc-uv');
-    if (pc) pc.textContent = v;
+    if (!pc) return;
+    const stat = pc.closest<HTMLElement>('.pc-stat');
+    if (stat) stat.style.display = '';
+    pc.textContent = v;
+  }
+
+  // 首页资料卡在「无缓存且始终拿不到数据」时整体隐藏这一项，避免挂着 – 显得坏了
+  function hideProfileCardStat() {
+    const stat = document.getElementById('pc-uv')?.closest<HTMLElement>('.pc-stat');
+    if (stat) stat.style.display = 'none';
   }
 
   function applyVisitorCount(v: string) {
@@ -57,18 +66,30 @@ const year = new Date().getFullYear();
     s.dataset.busuanzi = '';
     document.body.append(s);
 
-    // 3) 轮询新数据：busuanzi_value 被 no-script 填上真实值（≠'-'）才算返回；
-    //    拿到即刷新缓存并更新显示；约 12s 仍拿不到就保持缓存
-    let tries = 0;
-    const poll = () => {
-      const v = document.getElementById('busuanzi_value_site_uv')?.textContent;
-      if (v && v !== '-') {
-        try { localStorage.setItem(UV_KEY, v); } catch { /* 静默 */ }
-        applyVisitorCount(v);
-        return;
-      }
-      if (++tries < 40) setTimeout(poll, 300);
+    // 3) 轮询新数据：busuanzi_value 被填上真实值（≠'-'）才算返回；
+    //    拿到即刷新缓存并更新显示；约 12s 未拿到 → 20s 后重试一轮，仍拿不到且无缓存则隐藏统计项
+    const startPoll = (onGiveUp: () => void) => {
+      let tries = 0;
+      const tick = () => {
+        const v = document.getElementById('busuanzi_value_site_uv')?.textContent;
+        if (v && v !== '-') {
+          try { localStorage.setItem(UV_KEY, v); } catch { /* 静默 */ }
+          applyVisitorCount(v);
+          return;
+        }
+        if (++tries < 40) setTimeout(tick, 300);
+        else onGiveUp();
+      };
+      tick();
     };
-    poll();
+    startPoll(() => {
+      setTimeout(() => {
+        startPoll(() => {
+          let stillNoCache: string | null = null;
+          try { stillNoCache = localStorage.getItem(UV_KEY); } catch { /* 静默 */ }
+          if (!stillNoCache) hideProfileCardStat();
+        });
+      }, 20000);
+    });
   });
 </script>
