@@ -14,10 +14,8 @@ const year = new Date().getFullYear();
 <script>
   const UV_KEY = 'woju-uv';
 
-  // 把访客数同时回填到页脚计数行与首页资料卡统计
-  function applyVisitorCount(v: string) {
-    const pc = document.getElementById('pc-uv');
-    if (pc) pc.textContent = v;
+  // 回填页脚计数行（容器显示 + 数值）
+  function applyFooter(v: string) {
     const container = document.getElementById('busuanzi_container_site_uv');
     const value = document.getElementById('busuanzi_value_site_uv');
     if (container && value) {
@@ -26,13 +24,30 @@ const year = new Date().getFullYear();
     }
   }
 
+  // 把访客数回填到首页资料卡统计
+  function applyProfileCard(v: string) {
+    const pc = document.getElementById('pc-uv');
+    if (pc) pc.textContent = v;
+  }
+
+  function applyVisitorCount(v: string) {
+    applyProfileCard(v);
+    applyFooter(v);
+  }
+
   // 不蒜子脚本按页加载：View Transitions 导航后 DOM 被替换，数值需要重新回填；
   // 模块本身只执行一次，因此挂 astro:page-load 重注入脚本（访客数按 IP 去重，重复加载不虚增）
   document.addEventListener('astro:page-load', () => {
-    // 1) 缓存优先：先显示上次拿到的数值，网络波动时页面不再出现 – 或整行消失
+    // 1) 缓存优先：先显示上次拿到的数值，网络波动时页面不再出现 – 或整行消失。
+    //    注意：页脚计数值元素保持 '-' 不动——它是「不蒜子是否已真实返回」的判定信号，
+    //    若把缓存写进去，轮询会误判新数据已到而提前退出（PC 端曾因此永远停在旧值）。
     let cached: string | null = null;
     try { cached = localStorage.getItem(UV_KEY); } catch { /* 存储不可用时忽略 */ }
-    if (cached) applyVisitorCount(cached);
+    if (cached) {
+      applyProfileCard(cached);
+      const container = document.getElementById('busuanzi_container_site_uv');
+      if (container) container.style.display = '';
+    }
 
     // 2) 注入不蒜子脚本拉取最新值
     document.querySelectorAll<HTMLScriptElement>('script[data-busuanzi]').forEach((s) => s.remove());
@@ -42,7 +57,8 @@ const year = new Date().getFullYear();
     s.dataset.busuanzi = '';
     document.body.append(s);
 
-    // 3) 轮询新数据：拿到即刷新缓存并更新显示；约 12s 仍拿不到就保持缓存
+    // 3) 轮询新数据：busuanzi_value 被 no-script 填上真实值（≠'-'）才算返回；
+    //    拿到即刷新缓存并更新显示；约 12s 仍拿不到就保持缓存
     let tries = 0;
     const poll = () => {
       const v = document.getElementById('busuanzi_value_site_uv')?.textContent;
