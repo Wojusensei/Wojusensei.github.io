@@ -57,7 +57,7 @@ const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
           <a class="pc-icon" href={site.socials.github} target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" /></a>
           <a class="pc-icon" href={`https://space.bilibili.com/${site.socials.bilibili.replace(/\D/g, '')}`} target="_blank" rel="noopener" aria-label="Bilibili"><Icon name="bilibili" /></a>
           <a class="pc-icon" href={`mailto:${site.socials.email}`} aria-label="Email"><Icon name="mail" /></a>
-          <button class="pc-icon" type="button" data-copy-text={site.socials.qq} aria-label={`QQ ${site.socials.qq}`}><Icon name="qq" /></button>
+          <a class="pc-icon" href={`http://wpa.qq.com/msgrd?v=3&uin=${site.socials.qq}&site=qq&menu=yes`} target="_blank" rel="noopener" aria-label={`QQ ${site.socials.qq}`} title={`QQ: ${site.socials.qq}`}><Icon name="qq" /></a>
         </div>
       </div>
     </div>
@@ -91,15 +91,3 @@ const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
   </section>
   </div>
 </Base>
-<script>
-  // QQ 号复制（资料卡社交按钮）；访客数量由 Footer 统一管理（缓存 + 不蒜子回填）
-  document.addEventListener('astro:page-load', () => {
-    document.querySelectorAll<HTMLElement>('[data-copy-text]').forEach((btn) => {
-      if (btn.dataset.bound) return;
-      btn.dataset.bound = '1';
-      btn.addEventListener('click', async () => {
-        try { await navigator.clipboard.writeText(btn.dataset.copyText!); } catch { /* 静默 */ }
-      });
-    });
-  });
-</script>
