@@ -24,19 +24,10 @@ const year = new Date().getFullYear();
     }
   }
 
-  // 把访客数回填到首页资料卡统计（若曾被隐藏则恢复显示）
+  // 把访客数回填到首页资料卡统计
   function applyProfileCard(v: string) {
     const pc = document.getElementById('pc-uv');
-    if (!pc) return;
-    const stat = pc.closest<HTMLElement>('.pc-stat');
-    if (stat) stat.style.display = '';
-    pc.textContent = v;
-  }
-
-  // 首页资料卡在「无缓存且始终拿不到数据」时整体隐藏这一项，避免挂着 – 显得坏了
-  function hideProfileCardStat() {
-    const stat = document.getElementById('pc-uv')?.closest<HTMLElement>('.pc-stat');
-    if (stat) stat.style.display = 'none';
+    if (pc) pc.textContent = v;
   }
 
   function applyVisitorCount(v: string) {
@@ -67,7 +58,8 @@ const year = new Date().getFullYear();
     document.body.append(s);
 
     // 3) 轮询新数据：busuanzi_value 被填上真实值（≠'-'）才算返回；
-    //    拿到即刷新缓存并更新显示；约 12s 未拿到 → 20s 后重试一轮，仍拿不到且无缓存则隐藏统计项
+    //    拿到即刷新缓存并更新显示；约 12s 未拿到 → 20s 后重试一轮（统计项永不隐藏，
+    //    占位是 404，拿到真实数据后立即替换并永久缓存）
     const startPoll = (onGiveUp: () => void) => {
       let tries = 0;
       const tick = () => {
@@ -83,13 +75,7 @@ const year = new Date().getFullYear();
       tick();
     };
     startPoll(() => {
-      setTimeout(() => {
-        startPoll(() => {
-          let stillNoCache: string | null = null;
-          try { stillNoCache = localStorage.getItem(UV_KEY); } catch { /* 静默 */ }
-          if (!stillNoCache) hideProfileCardStat();
-        });
-      }, 20000);
+      setTimeout(() => startPoll(() => {}), 20000);
     });
   });
 </script>
