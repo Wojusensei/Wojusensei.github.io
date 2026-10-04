@@ -1,20 +1,22 @@
-// 友链头像构建时缓存：把 friends.ts 里的 avatarSrc 抓取到 public/friends/，
-// 页面只引用本地文件，浏览器不再直连 GitHub，避免头像区黑几秒或加载失败。
-// 抓取失败时若本地已有缓存则沿用缓存（离线构建也不受影响）；
-// 线上由 deploy.yml 的 6 小时定时构建负责刷新。
+// 头像构建时缓存：把 friends.ts / site.ts 里的 avatarSrc 抓取到本地（友链头像进
+// public/friends/，站长头像进 public/images/），页面只引用本地文件，浏览器不再直连
+// GitHub，避免头像区黑几秒或加载失败。抓取失败时若本地已有缓存则沿用缓存（离线构建
+// 也不受影响）；线上由 deploy.yml 的 6 小时定时构建负责刷新。
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const src = readFileSync(join(root, 'src/data/friends.ts'), 'utf8');
+const src = ['src/data/friends.ts', 'src/data/site.ts']
+  .map((f) => readFileSync(join(root, f), 'utf8'))
+  .join('\n');
 
 // 抓取 avatar → avatarSrc 成对条目；缓存文件名由 avatar 字段（页面引用的本地路径）决定
 const pairs = [...src.matchAll(/avatar:\s*'([^']+)'/g)].map((m) => m[1]);
 const sources = [...src.matchAll(/avatarSrc:\s*'([^']+)'/g)].map((m) => m[1]);
 if (pairs.length === 0 || pairs.length !== sources.length) {
-  console.log('friends.ts 中没有 avatar/avatarSrc 成对字段，跳过头像抓取');
+  console.log('friends.ts / site.ts 中没有 avatar/avatarSrc 成对字段，跳过头像抓取');
   process.exit(0);
 }
 
@@ -63,5 +65,5 @@ for (let i = 0; i < pairs.length; i++) {
   }
 }
 
-console.log(`友链头像：更新 ${updated}，沿用缓存 ${cached}，失败 ${failed}`);
+console.log(`头像缓存：更新 ${updated}，沿用缓存 ${cached}，失败 ${failed}`);
 if (failed > 0) process.exitCode = 1; // 有失败但不中断构建（页面用本地路径，缺文件才 404）

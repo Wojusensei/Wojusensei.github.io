@@ -4,6 +4,11 @@ export const site = {
   name: 'Wojusensei',
   url: 'https://wojusensei.github.io',
 
+  // 站长头像：构建时从 avatarSrc 抓取缓存到 avatar 路径（与友链头像同一机制，
+  // 随 GitHub 头像自动更新，每次 push 和每 6 小时定时构建刷新；抓取失败沿用上次缓存）
+  avatar: '/images/wojusensei-avatar.png',
+  avatarSrc: 'https://github.com/Wojusensei.png',
+
   // 社交联系方式（页面展示顺序即数组顺序）
   socials: {
     github: 'https://github.com/Wojusensei',
